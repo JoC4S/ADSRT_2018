@@ -1,8 +1,8 @@
-# ADSRT_2018
+//# ADSRT_2018
 /**
    * Program ADST_2012_X
    * Version   1.X
-  
+
    * Author    XXXX
    * Copyright (C) 2012 XXXX
    *
@@ -25,6 +25,6 @@
 
 int main (int argc, char *argv[])
 {
-	printf("Hello World");
+	printf("Hello World\n");
 	return 0;
 }
