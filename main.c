@@ -1,4 +1,4 @@
-//# ADSRT_2018
+///# ADSRT_2018
 /**
    * Program ADST_2012_X
    * Version   1.X
