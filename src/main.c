@@ -1,7 +1,7 @@
 /*!
    \file "main.c"
    \brief "Programa ADST_2018_1104934"
-   \author "Jose Cayero"
+   \author "1104934"
    \date "23"/"10"/"2018"
  * Copyright (C) 2012- 2018
  *
@@ -32,53 +32,54 @@
 #include <unistd.h>
 #include <sqlite3.h>
 
-int main(int argc, char **argv) {
-								int oflag = 0; /** Variable a*/
-								int bflag = 0; /** Variable b*/
-								char *ovalue = NULL; /** Valor del parameto o*/
-								char *cvalue = NULL; /** Valor del parameto c*/
+int dbfunc(char* opcion, char* nombredb);
+
+int main(int argc, char *argv[]) {
+								char *nombredb = NULL; /** Valor del parameto o*/
+								char *ovlaue = NULL; /** Valor del parameto o*/
 								int index;
 								int c;
-								//	int opterr = 0;
+								int opterr = 0;
 
-								while ((c = getopt(argc, argv, "o:bc:h")) != -1)
+								while ((c = getopt(argc, argv, "n:o:h")) != -1)
 																switch (c) {
-																case 'o':    /** Opcion para seleccionar el nombre de la base de datos*/
-																								oflag = 1;
-																								ovalue = optarg;
+																case 'n':
+																								nombredb = optarg;
 																								break;
-																case 'b':
-																								bflag = 1;
-																								break;
-																case 'c':
-																								cvalue = optarg;
+																case 'o':
+																								ovlaue = optarg;
 																								break;
 																case 'h':
-																								printf("Uso: main [opciones] archivo...\n");
-																								printf("-o	Abrir base de datos. Precisa 'nombre_base_datos.db'\n");
-																								printf("-i	Insertar Tabla. Pracisa 'nombre_tabla'\n");
-																								printf("-v	Inserta valor en tabla. Precisa.\n\n");
-																								break;
+																								printf("\nUso: main [opciones] archivo...\n");
+																								printf("\n-n	Abrir base de datos. Precisa 'nombre_base_datos.db'\n");
+																								printf("-o	Accion a realizar: 1 -Crear db. 2- Llenar Tabala.\n\n");
+																								return 0;
 																case '?':
-																								if (optopt == 'c' || optopt == 'o')
-																																printf("La opcion -%c requiere un argumento.\n", optopt);
+																								if (optopt == 'n' || optopt == 'o')
+																																printf("\nLa opcion -%c requiere un argumento.\n", optopt);
 																								else
 																																printf("Opcion desconocida  '%c'.\n", optopt);
+																								printf("Usar '-h' para Ayuda.\n");
 																								return 1;
 																default:
 																								abort();
 																}
 
-								printf("oflag = %d, ovalue = %s ,bflag = %d\n", oflag,ovalue, bflag );
-
+								//printf("oflag = %d, ovalue = %s ,bflag = %d\n", oflag,ovalue, bflag );
 								for (index = optind; index < argc; index++)
 																printf("Non-option argument %s\n", argv[index]);
-								sqlitefunc (1,ovalue);
+								printf("nombre base de datos: %s\n",nombredb);
+								if (optind == 1) {
+																printf("Se necesitan parametros. Usar -h para Ayuda.\n");
+																return 1;
+								}
+
+								dbfunc (ovlaue,nombredb);
 
 								return 0;
 }
 /*!
-   \brief Callback de la funcion sqlitefunc
+   \brief "Callback de la funcion sqlitefunc"
    \param "Param description"
    \pre "Pre-conditions"
    \post "Post-conditions"
@@ -96,20 +97,21 @@ static int callback(void *data, int argc, char **argv, char **azColName) {
 }
 /*!
    \brief "Funcion para uso del sqlite"
-   \param "Param description"
+   \param "Pasamos opcion y nombre de la base de datos."
    \pre "Pre-conditions"
    \post "Post-conditions"
-   \return "Return of the function"
+   \return "Devuelve integer"
  */
-int sqlitefunc(int opcion, char* nombredb) {
+int dbfunc(char* opcion, char* nombredb) {
 								sqlite3 *db;
 								char *zErrMsg = 0;
 								int rc;
-								char *sql;
+								int c = atoi(opcion);
+								char *sql = NULL;
 								const char* data = "Callback function called";
 
 								/* Open database */
-								rc = sqlite3_open("test.db", &db);
+								rc = sqlite3_open(nombredb, &db);
 
 								if( rc ) {
 																fprintf(stderr, "No se puede abrir la base de datos: %s\n", sqlite3_errmsg(db));
@@ -120,8 +122,24 @@ int sqlitefunc(int opcion, char* nombredb) {
 
 								/* Create merged SQL statement */
 								/** Ejecutaremos los SQL statmenst en funcion de la opcion que le pasemos a la funcion*/
-								sql = "DELETE from COMPANY where ID=2; " \
-														"SELECT * from COMPANY";
+								switch (c) {
+
+								case 1:     /** Crear Tabla en la base de datos*/
+																sql =  "CREATE TABLE tabla1("  \
+																						"HORA DATETIME       NOT NULL," \
+																						"TEMPERATURA FLOAT     NOT NULL);";
+																printf ("\n Crear tabla1 en %s.\n", nombredb);
+																break;
+								case 2:     /** Insertar datos en la tabla*/
+																sql = "INSERT INTO tabla1 (HORA, TEMPERATURA) "  \
+																						"VALUES ('2012-09­-10 18:56:10', 22.6 );";
+																printf ("\n  Añadir entrada en %s-tabla1.\n\n", nombredb);
+																break;
+								case 3:     /** Consultar datos de la tabla*/
+																sql = "SELECT * from tabla1";
+								default:
+																printf ("Ninguna acción a realizar con la base de datos.\n");
+								}
 
 								/* Execute SQL statement */
 								rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
