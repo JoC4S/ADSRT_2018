@@ -30,9 +30,56 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/time.h>
+#include <time.h>
 #include <sqlite3.h>
 
 int dbfunc(char* opcion, char* nombredb);
+
+char * timestamp(void)
+{
+
+        char fecha[20];
+        char hora[20];
+        char horadquirida[40];
+        int year = 0;
+        //Definim una variable de tipus time_t
+        time_t temps;
+
+        //Capturem el temps amb la funcio time(time_t *t);
+        temps = time(NULL);
+        //El valor de retorn es a una variable de tipus timei_t, on posaràl temps en segons des de 1970-01-01 00:00:00 +0000 (UTC)
+
+        // struct tm {
+        //     int tm_sec;         /* seconds */
+        //     int tm_min;         /* minutes */
+        //     int tm_hour;        /* hours */
+        //     int tm_mday;        /* day of the month */
+        //     int tm_mon;         /* month */
+        //     int tm_year;        /* year */
+        //     int tm_wday;        /* day of the week */
+        //     int tm_yday;        /* day in the year */
+        //     int tm_isdst;       /* daylight saving time */
+        //};
+
+        // Defineix punter a una estructura tm
+        struct tm * p_data;
+
+        //Funcion localtime() per traduir segons UTC a la hora:minuts:segons de la hora local
+        //struct tm *localtime(const time_t *timep);
+        p_data = localtime( &temps );
+
+        year = 1900 + p_data->tm_year;
+
+        /**Obtenemos y pasamos la fecha a un string */
+        sprintf(fecha, "%d-%d-%d", year, p_data->tm_mon, p_data->tm_mday);
+        /** Obtenemos y pasamos la hora a un string*/
+        sprintf(hora, "%d:%d:%d", p_data->tm_hour, p_data->tm_min, p_data->tm_sec);
+        /** Construimos la fecha y hora como cadena de caracteres*/
+        sprintf(horadquirida,"%s %s", fecha, hora);
+
+        return horadquirida;
+}
 
 int main(int argc, char *argv[]) {
 								char *nombredb = NULL; /** Valor del parameto o*/
@@ -109,6 +156,8 @@ int dbfunc(char* opcion, char* nombredb) {
 								int c = atoi(opcion);
 								char *sql = NULL;
 								const char* data = "Callback function called";
+								char* horamuestreo = timestamp();
+								float tempadquirida = 0;
 
 								/* Open database */
 								rc = sqlite3_open(nombredb, &db);
@@ -132,7 +181,7 @@ int dbfunc(char* opcion, char* nombredb) {
 																break;
 								case 2:     /** Insertar datos en la tabla*/
 																sql = "INSERT INTO tabla1 (HORA, TEMPERATURA) "  \
-																						"VALUES ('2012-09­-10 18:56:10', 22.6 );";
+																						"VALUES ( horamuestreo, 22.3 );";
 																printf ("\n  Añadir entrada en %s-tabla1.\n\n", nombredb);
 																break;
 								case 3:     /** Consultar datos de la tabla*/
