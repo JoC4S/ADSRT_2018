@@ -31,16 +31,13 @@
 
 int main(void)
 {
+        time_t rawtime;
+        struct tm *info;
+        char buffer[80];
 
-        char fecha[20];
-        char hora[20];
-        char horadquirida[40];
-        int year = 0;
-        //Definim una variable de tipus time_t
-        time_t temps;
+        time( &rawtime );
 
-        //Capturem el temps amb la funcio time(time_t *t);
-        temps = time(NULL);
+        info = localtime( &rawtime );
         //El valor de retorn es a una variable de tipus timei_t, on posaràl temps en segons des de 1970-01-01 00:00:00 +0000 (UTC)
 
         // struct tm {
@@ -55,22 +52,8 @@ int main(void)
         //     int tm_isdst;       /* daylight saving time */
         //};
 
-        // Defineix punter a una estructura tm
-        struct tm * p_data;
-
-        //Funcion localtime() per traduir segons UTC a la hora:minuts:segons de la hora local
-        //struct tm *localtime(const time_t *timep);
-        p_data = localtime( &temps );
-
-        year = 1900 + p_data->tm_year;
-
-        /**Obtenemos y pasamos la fecha a un string */
-        sprintf(fecha, "%d-%d-%d", year, p_data->tm_mon, p_data->tm_mday);
-        /** Obtenemos y pasamos la hora a un string*/
-        sprintf(hora, "%d:%d:%d", p_data->tm_hour, p_data->tm_min, p_data->tm_sec);
-        /** Construimos la fecha y hora como cadena de caracteres*/
-        sprintf(horadquirida,"%s %s", fecha, hora);
-        printf("Fecha: %s\n", horadquirida);
+        strftime(buffer,80,"%Y-%m-%d %H:%M:%S", info);
+        printf("Formatted date & time : %s\n", buffer );
 
         return 0;
 }
