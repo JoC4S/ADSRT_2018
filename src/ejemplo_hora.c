@@ -29,7 +29,7 @@
  * *
  * */
 
-char * timestamp(void)
+int main(void)
 {
 
         char fecha[20];
@@ -72,5 +72,5 @@ char * timestamp(void)
         sprintf(horadquirida,"%s %s", fecha, hora);
         printf("Fecha: %s\n", horadquirida);
 
-        return horadquirida;
+        return 0;
 }
