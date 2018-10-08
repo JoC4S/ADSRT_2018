@@ -239,8 +239,6 @@ void TancarSerie(int fd)
  */
 int SendcommSerie(int fd, char *missatgeSerie)
 {
-	//debug
-	printf(COLOR_RED "Comienza la ejecucion de la funcion commSerie\n" COLOR_RESET );
 	int i = 0;
 	int res = 0;
 	// Bloqueamos acceso al puerto Serie al resto de threads y procesos.
@@ -253,19 +251,24 @@ int SendcommSerie(int fd, char *missatgeSerie)
 		exit(-1);
 	}
 	// Mostramos por pantalla el mensaje y los bytes enviados.
-	printf(COLOR_GREEN "Enviats Serie %d bytes: ", res );
-	printf (COLOR_RESET "%s\n",missatgeSerie);
+	printf(COLOR_GREEN "<--Enviats Serie %d bytes.\n", res );
+	printf (COLOR_RESET );
 	return 0;
 }
-
 /*!
    \brief "Funcion para la recepcion por Serie : recieveCommSerie(int fd, char buf)""
    \param "int fd; char buf"
    \return "Return of the function"
 */
+/*!< char buf[256] : Variable global para el almacenamiento de los mensajes recibidos por puerto Serie. */
+char buf[256];
+
 int recieveCommSerie(int fd, char buf[256])
 {
-	int i = 0, errorMsg = 0, bytes = 0;
+	int i = 0;
+	int errorMsg = 0;
+	int bytes = 0;
+	printf("emtra en la funcion receiveCommSerie\n");
 
 	/** Se borra el buffer Serie antes de iniciar la recepción.*/
 	memset(buf, '\0', 256);
@@ -273,6 +276,7 @@ int recieveCommSerie(int fd, char buf[256])
 	while (!bytes) {
 		ioctl(fd, FIONREAD, &bytes);
 		while (bytes > 0) {
+			printf("dentro del while %d\n",i);
 			read(fd, buf + i, 1);
 			bytes--;
 			i++;
@@ -335,10 +339,23 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	dbfunc(ovlaue, nombredb);
-
 	/** Se configura y abre el puerto serie*/
 	ConfigurarSerie(fd);
-	SendcommSerie(fd, "Solicitar TEMPERATURA");
+
+	/** Enviamos el parametro para que se inicie la adquisicion de datos.*/
+	/**Operació 'M'
+	: Marxa / Parada conversió
+	* COMANDA: 'A''M' v Temps Temps Núm 'Z'
+		v: 	(0=parada / 1=marxa)
+		Temps: 	temps en segons de mostreig (1..20)
+		Núm: 	Número de mostres fer la mitjana (1..9)	*/
+	SendcommSerie(fd, "AM1053Z");
+	/** Esperamos la respuesta del Arduino al mensaje de inicio de adquisicion.*/
+	recieveCommSerie(fd, buf);
+	if (buf[2] != '0'){
+		fprintf(stderr, "ERROR de protocolo.\n");
+		return 1;
+	}
 	TancarSerie(fd);
 
 	return 0;
