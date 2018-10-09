@@ -60,6 +60,8 @@ void setup() {
   TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
   interrupts(); // enable all interrupts
 
+  Serial.setTimeout(100); 
+
 }
 
 void loop()
@@ -76,7 +78,7 @@ void loop()
 
           codiRetorn = checkMsgS(msgIn);
           msgOut = "AS" + codiRetorn + "Z";
-          Serial.write (msgOut.c_str());          //la Funcion String.c_str(), pasa a puntero el string que pongamos.
+          Serial.write (msgOut.c_str());                                       //la Funcion String.c_str(), pasa a puntero el string que pongamos.
           if (codiRetorn == "0")
           {
             ePinSalida = VPinS;
@@ -91,8 +93,9 @@ void loop()
 
           codiRetorn = checkMsgE(msgIn);
           msgOut = "AE" + codiRetorn + digitalRead(PinE) + "Z";
+          Serial.write (msgOut.c_str());                                       //la Funcion String.c_str(), pasa a puntero el string que pongamos.
           //********************************DEBUG salida*************************************************//
-          Serial.print( "Salida - "); Serial.print(PinE); Serial.print (" = "); Serial.println(digitalRead(PinE));
+          //Serial.print( "Salida - "); Serial.print(PinE); Serial.print (" = "); Serial.println(digitalRead(PinE));
           //*********************************************************************************************//
           break;
 

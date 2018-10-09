@@ -28,9 +28,12 @@
 #include <string.h>
 
 
-#define COLOR_GREEN "\033[32m"
-#define COLOR_RED "\031[43m"
+#define COLOR_GREEN "\x1B[32m"
+#define COLOR_RED "\x1B[31m"
+#define COLOR_YELLOW "\x1B[33m"
 #define COLOR_RESET "\033[0m"
+#define PIN_VENTILADOR "03"
+#define CONST_TEMP 0.048 /*!< Constante de ttemperatura para el sensor mV * nivel. */
 
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -116,11 +119,11 @@ int dbfunc(char *opcion, char *nombredb)
 	/* Abrimos la base de datos. */
 	rc = sqlite3_open(nombredb, &db);
 	if ( rc ) {
-		fprintf(stderr, "---> No se puede abrir la base de datos: %s\n", sqlite3_errmsg(db));
+		fprintf(stderr,COLOR_RED "---> No se puede abrir la base de datos: %s\n" COLOR_RESET, sqlite3_errmsg(db));
 		return 0;
 	} else {
 		if (nombredb == NULL) {
-			fprintf(stderr, " ERROR: Se necesita un nombre para la base de datos.\n");
+			fprintf(stderr,COLOR_RED " ERROR: Se necesita un nombre para la base de datos.\n" COLOR_RESET);
 			return 1;
 		}
 		else
@@ -161,7 +164,8 @@ int dbfunc(char *opcion, char *nombredb)
 		sqlite3_finalize(stmt);
 		break;
 	case 3: /** Consultar datos de la tabla*/
-		sql = "SELECT * from DATOS";
+		strcpy(sql,"SELECT * from DATOS");
+	//	sql = "SELECT * from DATOS";
 	default:
 		printf("Ninguna acción a realizar con la base de datos.\n");
 	}
@@ -198,11 +202,11 @@ int ConfigurarSerie(int fd)
 	fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY);
 	if (fd < 0) {
 		perror(MODEMDEVICE);
-		fprintf(stderr,"No se ha podido abrir el puerto '/dev/ttyACM0'.\n");
+		fprintf(stderr,COLOR_RED "No se ha podido abrir el puerto '/dev/ttyACM0'.\n" COLOR_RESET);
 		exit(-1);
 	}
 	else
-		printf("Puerto Serie abierto: '/dev/ttyACM0'\n");
+		printf(COLOR_GREEN "Puerto Serie abierto: '/dev/ttyACM0'\n" COLOR_RESET);
 	tcgetattr(fd, &oldtio); /* save current port settings */
 	bzero(&newtio, sizeof(newtio));
 	// newtio.c_cflag = BAUDRATE | CRTSCTS | CS8 | CLOCAL | CREAD;
@@ -222,14 +226,15 @@ int ConfigurarSerie(int fd)
    \brief "Cierra el puerto Serie"
    \param "int fd: File descriptor"
    \return "void"
-*/
+ */
 void TancarSerie(int fd)
 {
-	//tcsetattr(fd, TCSANOW, &oldtio);
-	if (close(fd) != 0){
+	/** EL parametro TCSANOW implica que la accion se realiaz de forma inmediata*/
+	tcsetattr(fd, TCSANOW, &oldtio);
+	if (close(fd) != 0) {
 		fprintf(stderr, "No se ha podido cerrar el puerto: '/dev/ttyACM0'.\n");
 	}else{
-		printf("Puerto serie cerrado: '/dev/ttyACM0'.\n");
+		printf(COLOR_GREEN "Puerto serie cerrado: '/dev/ttyACM0'.\n");
 	}
 }
 /*!
@@ -251,7 +256,8 @@ int SendcommSerie(int fd, char *missatgeSerie)
 		exit(-1);
 	}
 	// Mostramos por pantalla el mensaje y los bytes enviados.
-	printf(COLOR_GREEN "<--Enviats Serie %d bytes.\n", res );
+	printf(COLOR_YELLOW "%s ",missatgeSerie );
+	printf(COLOR_GREEN "--> :Envio Serie %d bytes.\n", res );
 	printf (COLOR_RESET );
 	return 0;
 }
@@ -259,7 +265,7 @@ int SendcommSerie(int fd, char *missatgeSerie)
    \brief "Funcion para la recepcion por Serie : recieveCommSerie(int fd, char buf)""
    \param "int fd; char buf"
    \return "Return of the function"
-*/
+ */
 /*!< char buf[256] : Variable global para el almacenamiento de los mensajes recibidos por puerto Serie. */
 char buf[256];
 
@@ -268,7 +274,6 @@ int recieveCommSerie(int fd, char buf[256])
 	int i = 0;
 	int errorMsg = 0;
 	int bytes = 0;
-	printf("emtra en la funcion receiveCommSerie\n");
 
 	/** Se borra el buffer Serie antes de iniciar la recepción.*/
 	memset(buf, '\0', 256);
@@ -276,20 +281,139 @@ int recieveCommSerie(int fd, char buf[256])
 	while (!bytes) {
 		ioctl(fd, FIONREAD, &bytes);
 		while (bytes > 0) {
-			printf("dentro del while %d\n",i);
+
 			read(fd, buf + i, 1);
 			bytes--;
 			i++;
 		}
-		if (buf[0] == 'A' && (buf[3] == 'Z' || buf[7] == 'Z')) {
-			printf(COLOR_GREEN "Rebut Serie %ld bytes: %s", strlen(buf), buf);
+		if (buf[0] == 'A' && (buf[3] == 'Z' || buf[7] == 'Z' || buf[4] == 'Z')) {
+			printf(COLOR_YELLOW "%s ", buf);
+			printf(COLOR_GREEN "<-- :Recibido Serie %ld bytes.\n", strlen(buf));
+			printf(COLOR_RESET);
 			break;
-		}
+		}else
+			errorMsg = 1;
 	}
 	printf(COLOR_RESET "\n");
 	// Se libera el puerto Serie
 	//pthread_mutex_unlock(&varmutex);
 	return errorMsg;
+}
+
+int menudebug(void){
+
+	int opcion = 0;
+	printf(COLOR_YELLOW  "-------------------------\n");
+	printf("Opciones:\n");
+	printf("-------------------------\n");
+	printf("1- Solicitar temperatura.\n");
+	printf("2- Encender Ventilador.\n");
+	printf("3- Apagar Ventilador.\n");
+	printf("4- Solicitar estado de Ventilador.\n");
+	printf("5- Detener Programa.\n");
+	printf("-------------------------\n\n" COLOR_RESET);
+	printf("Seleccionada opción: ");
+	scanf("%d",&opcion );
+
+	return opcion;
+}
+
+/*!
+   \brief "Enciende/Apaga el Ventilador."
+   \param "char * estado: 1- Encender, 0- Apagar"
+   \pre "PIN_VENTILADOR comprendido entre 0 y 13."
+   \return "int OnOff: 1= Ventilador encendido, 2=Ventilador apagado."
+*/
+int fanOnOff (char *estado){
+
+	char orden[7] = "\0";
+	int OnOff;
+	strcpy(orden, "AS");
+	strcat(orden, PIN_VENTILADOR);
+	strcat(orden,estado);
+	strcat(orden,"Z");
+	SendcommSerie(fd, orden);
+	recieveCommSerie(fd,buf);
+	if (buf[2] =='0'){
+		OnOff = atoi(estado);
+		return OnOff;
+	}else{
+		fprintf(stderr, COLOR_RED "Error en comando.\n");
+	}
+}
+
+/*!
+   \brief "Obtiene el dato de temperatura del sensor."
+   \param "Param description"
+   \pre "Pre-conditions"
+   \post "Post-conditions"
+   \return "float muestratemperatura"
+*/
+float temperatura (){
+
+	char orden[7] = "\0";
+	int i;
+	char tmp[6] = "\0";
+	int muestratemperatura_raw = 0;
+	float muestratemperatura = 0.0;
+	strcpy(orden, "ACZ");
+	SendcommSerie(fd, orden);
+	recieveCommSerie(fd,buf);
+	/** Se convierte el dato del buffer, se pasa a integer
+	y se multiplica por la constante del sensor para obtener la temperatura*/
+	for (i = 0; i < 5; i++) {
+		tmp[i] = buf[i+3];
+	}
+	muestratemperatura_raw = atoi(tmp);
+	muestratemperatura = muestratemperatura_raw * CONST_TEMP;
+	return muestratemperatura;
+}
+/*!
+   \brief "Adquiere de forma periodica los datos del sensor de temperatura y los almacena en la base de datos."
+   \param "Param description"
+   \pre "El peurto de comunicación serie debe estar abierto."
+   \pre "La base de datos debe estar previamente creada."
+   \return "Return of the function"
+ */
+
+int adquisicion (int fd, char buf[256]){
+
+	int i;
+	char orden[7] = "\0";
+	char c = 'n';
+	printf("Iniciar Adquisición? (y/n): ");
+	scanf("%c",&c);
+	while (c!= 'n') {
+		i = menudebug();
+		switch (i) {
+		case 1:         /** Solicitar TEMPERATURA*/
+			temperatura();
+			break;
+		case 2:         /** Enciede el VENTILADOR ASnnvZ */
+			fanOnOff("1");
+			break;
+		case 3:         /** Apaga el VENTILADOR ASnnvZ */
+			fanOnOff("0");
+			break;
+		case 4:         /** Solicita estado del ventilador AEnnZ*/
+			strcpy(orden, "AE");
+			strcat(orden, PIN_VENTILADOR);
+			strcat(orden,"Z");
+			SendcommSerie(fd, orden);
+			getchar();
+			recieveCommSerie(fd,buf);
+			break;
+		case 5:         /** Salir del programa*/
+			c = 'n';
+			printf("Saliendo de programa.\n");
+			break;
+		default:
+			c = 'n';
+			break;
+			printf("Continuar Adquisición? (y/n): ");
+			scanf("%c",&c);
+		}
+	}
 }
 
 /*!
@@ -340,21 +464,23 @@ int main(int argc, char *argv[])
 	}
 	dbfunc(ovlaue, nombredb);
 	/** Se configura y abre el puerto serie*/
-	ConfigurarSerie(fd);
-
+	fd = ConfigurarSerie(fd);
 	/** Enviamos el parametro para que se inicie la adquisicion de datos.*/
 	/**Operació 'M'
-	: Marxa / Parada conversió
-	* COMANDA: 'A''M' v Temps Temps Núm 'Z'
-		v: 	(0=parada / 1=marxa)
-		Temps: 	temps en segons de mostreig (1..20)
-		Núm: 	Número de mostres fer la mitjana (1..9)	*/
+	   : Marxa / Parada conversió
+	 * COMANDA: 'A''M' v Temps Temps Núm 'Z'
+	        v:      (0=parada / 1=marxa)
+	        Temps:  temps en segons de mostreig (1..20)
+	        Núm:    Número de mostres fer la mitjana (1..9)	*/
 	SendcommSerie(fd, "AM1053Z");
 	/** Esperamos la respuesta del Arduino al mensaje de inicio de adquisicion.*/
+	/** En caso de no haber error, iniciamos la adquisicion de datos*/
 	recieveCommSerie(fd, buf);
-	if (buf[2] != '0'){
-		fprintf(stderr, "ERROR de protocolo.\n");
+	if (buf[2] != '0') {
+		fprintf(stderr, COLOR_RED "ERROR en protocolo comunicacion.\n" COLOR_RESET);
 		return 1;
+	}else{
+		adquisicion(fd, buf);
 	}
 	TancarSerie(fd);
 

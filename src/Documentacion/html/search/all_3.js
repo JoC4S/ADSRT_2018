@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['recievecommserie',['recieveCommSerie',['../d0/d29/main_8c.html#ace562236c7aba9a645385fe701461288',1,'main.c']]]
+  ['dbfunc',['dbfunc',['../d0/d29/main_8c.html#a35721dca14dd4d03bc7fa2f57670c4a0',1,'main.c']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['baudrate',['BAUDRATE',['../d0/d29/main_8c.html#a734bbab06e1a9fd2e5522db0221ff6e3',1,'main.c']]]
+  ['adquisicion',['adquisicion',['../d0/d29/main_8c.html#a81232165dd9b72696c8d27ecd7ea2e97',1,'main.c']]]
 ];
