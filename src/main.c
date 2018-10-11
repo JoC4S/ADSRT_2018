@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <sys/signal.h>
 #include <time.h>
 #include <sqlite3.h>
 #include <string.h>
@@ -34,6 +35,9 @@
 #define COLOR_RESET "\033[0m"
 #define PIN_VENTILADOR "03"
 #define CONST_TEMP 0.048 /*!< Constante de ttemperatura para el sensor mV * nivel. */
+int SerialCommTimeOUT;
+int AlarmCommTimeOUT;
+
 
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -198,7 +202,6 @@ int fd = 0;
 
 int ConfigurarSerie(int fd)
 {
-
 	fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY);
 	if (fd < 0) {
 		perror(MODEMDEVICE);
@@ -219,8 +222,20 @@ int ConfigurarSerie(int fd)
 	newtio.c_cc[VMIN] = 1;  /* blocking read until 1 chars received */
 	tcflush(fd, TCIFLUSH);
 	tcsetattr(fd, TCSANOW, &newtio);
-	// sleep(1); //Per donar temps a que l'Arduino es recuperi del RESET
+	//sleep(1); //Per donar temps a que l'Arduino es recuperi del RESET
 	return fd;
+}
+/*!
+   \brief "Funcion de trigger del flag alarma de tiempo de comunicacion Serie excedido."
+   \param "Param description"
+   \pre "Pre-conditions"
+   \post "Post-conditions"
+   \return "Return of the function"
+*/
+void alarm_SerialCommtimeout(int signum){
+
+ 	if (AlarmCommTimeOUT)
+		SerialCommTimeOUT = 1;
 }
 /*!
    \brief "Cierra el puerto Serie"
@@ -237,6 +252,8 @@ void TancarSerie(int fd)
 		printf(COLOR_GREEN "Puerto serie cerrado: '/dev/ttyACM0'.\n");
 	}
 }
+
+char buf[256];
 /*!
    \brief "Enviar mensage por puerto serie : SendcommSerie(int fd, char *missatgeSerie)."
    \param "int fd: Descripción de puerto serie ; char *missatgeSerie : Mensage a enviar."
@@ -262,55 +279,97 @@ int SendcommSerie(int fd, char *missatgeSerie)
 	return 0;
 }
 /*!
-   \brief "Funcion para la recepcion por Serie : recieveCommSerie(int fd, char buf)""
+   \brief "Funcion para la recepcion por Serie.
+   \brief En caso de error de comunicación se realizan 3 intentos.
    \param "int fd; char buf"
    \return "Return of the function"
  */
 /*!< char buf[256] : Variable global para el almacenamiento de los mensajes recibidos por puerto Serie. */
-char buf[256];
 
 int recieveCommSerie(int fd, char buf[256])
 {
 	int i = 0;
-	int errorMsg = 0;
 	int bytes = 0;
 
 	/** Se borra el buffer Serie antes de iniciar la recepción.*/
 	memset(buf, '\0', 256);
+	int delay = 0;
+	useconds_t sleeptime = 50000; /** Tiempo en microsegundos*/
+	//set up alarm handler
+        signal(SIGALRM, alarm_SerialCommtimeout);
+	AlarmCommTimeOUT= 1;
+	SerialCommTimeOUT = 0;
+
+	printf("Esperando mensaje entrante (delay = %i us)...",delay);
+
 	/**Leemos el buffer de entrada de uno en uno hasta tener un mensaje completo.*/
+	ioctl(fd, FIONREAD, &bytes);
+	alarm(3);/** Seteamos alarma de timeout a 3 segundos*/
 	while (!bytes) {
 		ioctl(fd, FIONREAD, &bytes);
+		usleep(sleeptime);
+		delay = delay + sleeptime;
+		printf("\rEsperando mensaje entrante (delay = %i us)...",delay);
+		fflush(stdout);
+		/** Si se excede el tiempo de comunicación, salimos de la funcion dando ERROR -1*/
+		if (SerialCommTimeOUT){
+			fprintf(stderr,COLOR_RED "\nSerial.Comm TIMEOUT\n" COLOR_RESET);
+			return -1;
+			break;
+		}
+		printf ("Valor de Bytes %d\n",bytes);
 		while (bytes > 0) {
-
 			read(fd, buf + i, 1);
 			bytes--;
 			i++;
 		}
-		if (buf[0] == 'A' && (buf[3] == 'Z' || buf[7] == 'Z' || buf[4] == 'Z')) {
-			printf(COLOR_YELLOW "%s ", buf);
+		/** Si el protocolo es correcto se sale devolviendo 1.*/
+		/** En caso de error en la trama (inicio "A" o fin "Z"), devolvemos 0*/
+		/** En caso de error de protocolo (buf[2] != 0) devolvemos 0*/
+		if (buf[0] != '\0'){
+			/** Mmostramos los datos recibidos.*/
+			printf(COLOR_YELLOW "\n%s ", buf);
 			printf(COLOR_GREEN "<-- :Recibido Serie %ld bytes.\n", strlen(buf));
 			printf(COLOR_RESET);
-			break;
-		}else
-			errorMsg = 1;
+
+			if (buf[0] == 'A' && (buf[3] == 'Z' || buf[7] == 'Z' || buf[4] == 'Z')) {
+				AlarmCommTimeOUT= 0;
+				return 1;
+				break;
+			}else if (buf[0] != 'A' && (buf[3] != 'Z' || buf[7] != 'Z' || buf[4] != 'Z')) {
+				fprintf(stderr, COLOR_RED "ERROR en la trama comunicacion.\n" COLOR_RESET);
+				memset(buf, '\0', 256);
+				AlarmCommTimeOUT= 0;
+				return 0;
+				break;
+			}else{
+				fprintf(stderr, COLOR_RED "ERROR en protocolo comunicacion.\n" COLOR_RESET);
+				memset(buf, '\0', 256);
+				AlarmCommTimeOUT= 0;
+				return 0;
+				break;
+			}
+		}
 	}
-	printf(COLOR_RESET "\n");
+
 	// Se libera el puerto Serie
 	//pthread_mutex_unlock(&varmutex);
-	return errorMsg;
+	return 1;
 }
 
 int menudebug(void){
 
 	int opcion = 0;
-	printf(COLOR_YELLOW  "-------------------------\n");
+	printf(COLOR_YELLOW  "\n-------------------------\n");
 	printf("Opciones:\n");
 	printf("-------------------------\n");
 	printf("1- Solicitar temperatura.\n");
 	printf("2- Encender Ventilador.\n");
 	printf("3- Apagar Ventilador.\n");
 	printf("4- Solicitar estado de Ventilador.\n");
-	printf("5- Detener Programa.\n");
+	printf("5- Forzar error comm.\n");
+	printf("6- Forzar comunicacion no contesta.\n");
+	printf("7- Detener Programa.\n");
 	printf("-------------------------\n\n" COLOR_RESET);
 	printf("Seleccionada opción: ");
 	scanf("%d",&opcion );
@@ -323,23 +382,20 @@ int menudebug(void){
    \param "char * estado: 1- Encender, 0- Apagar"
    \pre "PIN_VENTILADOR comprendido entre 0 y 13."
    \return "int OnOff: 1= Ventilador encendido, 2=Ventilador apagado."
-*/
+ */
 int fanOnOff (char *estado){
 
 	char orden[7] = "\0";
 	int OnOff;
-	strcpy(orden, "AS");
-	strcat(orden, PIN_VENTILADOR);
-	strcat(orden,estado);
-	strcat(orden,"Z");
-	SendcommSerie(fd, orden);
-	recieveCommSerie(fd,buf);
-	if (buf[2] =='0'){
-		OnOff = atoi(estado);
-		return OnOff;
-	}else{
-		fprintf(stderr, COLOR_RED "Error en comando.\n");
+	if ((estado == "0") || (estado == "1")){
+		strcpy(orden, "AS");
+		strcat(orden, PIN_VENTILADOR);
+		strcat(orden,estado);
+		strcat(orden,"Z");
+		SendcommSerie(fd, orden);
+		recieveCommSerie(fd,buf);
 	}
+
 }
 
 /*!
@@ -348,7 +404,7 @@ int fanOnOff (char *estado){
    \pre "Pre-conditions"
    \post "Post-conditions"
    \return "float muestratemperatura"
-*/
+ */
 float temperatura (){
 
 	char orden[7] = "\0";
@@ -360,12 +416,13 @@ float temperatura (){
 	SendcommSerie(fd, orden);
 	recieveCommSerie(fd,buf);
 	/** Se convierte el dato del buffer, se pasa a integer
-	y se multiplica por la constante del sensor para obtener la temperatura*/
+	   y se multiplica por la constante del sensor para obtener la temperatura*/
 	for (i = 0; i < 5; i++) {
 		tmp[i] = buf[i+3];
 	}
 	muestratemperatura_raw = atoi(tmp);
 	muestratemperatura = muestratemperatura_raw * CONST_TEMP;
+	printf("|---> Temperatura: %2.2f\n\n",muestratemperatura);
 	return muestratemperatura;
 }
 /*!
@@ -403,9 +460,10 @@ int adquisicion (int fd, char buf[256]){
 			getchar();
 			recieveCommSerie(fd,buf);
 			break;
-		case 5:         /** Salir del programa*/
+		case 6:         /** Salir del programa*/
 			c = 'n';
 			printf("Saliendo de programa.\n");
+			return 0;
 			break;
 		default:
 			c = 'n';
@@ -414,6 +472,17 @@ int adquisicion (int fd, char buf[256]){
 			scanf("%c",&c);
 		}
 	}
+}
+/*!
+   \brief Alarma Timeout comunicacion.
+   \param "Param description"
+   \pre "Pre-conditions"
+   \post "Post-conditions"
+   \return "Return of the function"
+ */
+void alarm_handler(int signum){
+	printf("Comunicación timeout\n");
+	SerialCommTimeOUT = 1;
 }
 
 /*!
@@ -475,10 +544,10 @@ int main(int argc, char *argv[])
 	SendcommSerie(fd, "AM1053Z");
 	/** Esperamos la respuesta del Arduino al mensaje de inicio de adquisicion.*/
 	/** En caso de no haber error, iniciamos la adquisicion de datos*/
-	recieveCommSerie(fd, buf);
-	if (buf[2] != '0') {
-		fprintf(stderr, COLOR_RED "ERROR en protocolo comunicacion.\n" COLOR_RESET);
-		return 1;
+	/** En caso de TIMEOUT en la comunicación, reintentamos 3 veces ante de salir*/
+	/** Se puede habilitar variable y opcion de incio para el numero de reintentos*/
+	if (!recieveCommSerie(fd, buf)){
+		printf("Cerrando puerto Serie....");
 	}else{
 		adquisicion(fd, buf);
 	}
