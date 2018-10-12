@@ -1,6 +1,5 @@
 var main_8c =
 [
-    [ "_POSIX_SOURCE", "d0/d29/main_8c.html#ac3d144aa01e765a1fae62ab5491c7cc1", null ],
     [ "BAUDRATE", "d0/d29/main_8c.html#a734bbab06e1a9fd2e5522db0221ff6e3", null ],
     [ "COLOR_GREEN", "d0/d29/main_8c.html#afc9149f5de51bd9ac4f5ebbfa153f018", null ],
     [ "COLOR_RED", "d0/d29/main_8c.html#ad86358bf19927183dd7b4ae215a29731", null ],
@@ -9,10 +8,13 @@ var main_8c =
     [ "CONST_TEMP", "d0/d29/main_8c.html#af81e429234dedf0f68fbc22501147012", null ],
     [ "MODEMDEVICE", "d0/d29/main_8c.html#aef28fa078fce7d7d79c1a28315cfda05", null ],
     [ "PIN_VENTILADOR", "d0/d29/main_8c.html#ad8ff202ed1966d6db435a234f7e53204", null ],
+    [ "TIMEOUT_TEMP", "d0/d29/main_8c.html#a3038d405961f05975832d64d96f5e321", null ],
     [ "adquisicion", "d0/d29/main_8c.html#a81232165dd9b72696c8d27ecd7ea2e97", null ],
+    [ "alarm_handler", "d0/d29/main_8c.html#a6745b86fbd6eeec00e183b7fffe894e8", null ],
+    [ "alarm_SerialCommtimeout", "d0/d29/main_8c.html#acb8610d67d76b5b3f96f502f4e6c0b23", null ],
     [ "ConfigurarSerie", "d0/d29/main_8c.html#a4ac194106572f1d9defbdb34642fa9c6", null ],
     [ "dbfunc", "d0/d29/main_8c.html#a35721dca14dd4d03bc7fa2f57670c4a0", null ],
-    [ "fanOnOff", "d0/d29/main_8c.html#a5efe435121a4b1fe0730b8dcf7123f02", null ],
+    [ "fanOnOff", "d0/d29/main_8c.html#a7972b882b524b0bdbbbcc1cef51532b6", null ],
     [ "main", "d0/d29/main_8c.html#a0ddf1224851353fc92bfbff6f499fa97", null ],
     [ "menudebug", "d0/d29/main_8c.html#ad658de9cd5732a9646afe86ea97a5447", null ],
     [ "recieveCommSerie", "d0/d29/main_8c.html#ace562236c7aba9a645385fe701461288", null ],
@@ -20,7 +22,9 @@ var main_8c =
     [ "TancarSerie", "d0/d29/main_8c.html#abb64813dff778d83119432217f5b2f4a", null ],
     [ "temperatura", "d0/d29/main_8c.html#aa46c73a0e1526478851e8b24b8fa0751", null ],
     [ "timestamp", "d0/d29/main_8c.html#a74a3ec45ea351347c2d0dff256279ae8", null ],
+    [ "AlarmCommTimeOUT", "d0/d29/main_8c.html#a6d142fe9d4c915dba2208ba262f80dbb", null ],
     [ "buf", "d0/d29/main_8c.html#a866e3eea299e33d1f7cdc6e46e65835f", null ],
     [ "fd", "d0/d29/main_8c.html#a6f8059414f0228f0256115e024eeed4b", null ],
-    [ "newtio", "d0/d29/main_8c.html#abc97f5054a1b45039965e4ee787abc03", null ]
+    [ "nombredb", "d0/d29/main_8c.html#a16aba9cd49b38df68a72d1f0d49cb766", null ],
+    [ "SerialCommTimeOUT", "d0/d29/main_8c.html#a403285e37450b4db1fd1a7b456ad7921", null ]
 ];
