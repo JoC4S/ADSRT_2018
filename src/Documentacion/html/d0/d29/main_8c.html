@@ -129,14 +129,20 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>COLOR_RESET</b>&#160;&#160;&#160;&quot;\033[0m&quot;</td></tr>
 <tr class="separator:a17f760256046df23dd0ab46602f04d02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8ff202ed1966d6db435a234f7e53204"><td class="memItemLeft" align="right" valign="top"><a id="ad8ff202ed1966d6db435a234f7e53204"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>PIN_VENTILADOR</b>&#160;&#160;&#160;&quot;03&quot;	/** Pin de Arduino que activa el ventilador*/</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>PIN_VENTILADOR</b>&#160;&#160;&#160;&quot;03&quot;                     /** Pin de Arduino que activa el ventilador*/</td></tr>
 <tr class="separator:ad8ff202ed1966d6db435a234f7e53204"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af81e429234dedf0f68fbc22501147012"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#af81e429234dedf0f68fbc22501147012">CONST_TEMP</a>&#160;&#160;&#160;0.048</td></tr>
 <tr class="separator:af81e429234dedf0f68fbc22501147012"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3038d405961f05975832d64d96f5e321"><td class="memItemLeft" align="right" valign="top"><a id="a3038d405961f05975832d64d96f5e321"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>TIMEOUT_TEMP</b>&#160;&#160;&#160;3</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>TIMEOUT_TEMP</b>&#160;&#160;&#160;3                          /** Tiempo en segundos para provocar un error de timeout*/</td></tr>
 <tr class="separator:a3038d405961f05975832d64d96f5e321"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a734bbab06e1a9fd2e5522db0221ff6e3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a734bbab06e1a9fd2e5522db0221ff6e3">BAUDRATE</a>&#160;&#160;&#160;B9600</td></tr>
+<tr class="memitem:a450f54a9ac27bb43b59a9fae9f45942c"><td class="memItemLeft" align="right" valign="top"><a id="a450f54a9ac27bb43b59a9fae9f45942c"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>TIME_ADQ</b>&#160;&#160;&#160;5</td></tr>
+<tr class="separator:a450f54a9ac27bb43b59a9fae9f45942c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab39fec97d85960796efedec442f38004"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#ab39fec97d85960796efedec442f38004">INTERVAL</a>&#160;&#160;&#160;3000                           /* number of milliseconds to go off */</td></tr>
+<tr class="separator:ab39fec97d85960796efedec442f38004"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a734bbab06e1a9fd2e5522db0221ff6e3"><td class="memItemLeft" align="right" valign="top"><a id="a734bbab06e1a9fd2e5522db0221ff6e3"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>BAUDRATE</b>&#160;&#160;&#160;B9600                          /** Velocidad de transferecnia en comunicacion serie.*/</td></tr>
 <tr class="separator:a734bbab06e1a9fd2e5522db0221ff6e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef28fa078fce7d7d79c1a28315cfda05"><td class="memItemLeft" align="right" valign="top"><a id="aef28fa078fce7d7d79c1a28315cfda05"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>MODEMDEVICE</b>&#160;&#160;&#160;&quot;/dev/ttyACM0&quot;</td></tr>
@@ -150,12 +156,12 @@ Functions</h2></td></tr>
 <tr class="memitem:aa46c73a0e1526478851e8b24b8fa0751"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#aa46c73a0e1526478851e8b24b8fa0751">temperatura</a> ()</td></tr>
 <tr class="memdesc:aa46c73a0e1526478851e8b24b8fa0751"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Obtiene el dato de temperatura del sensor."  <a href="#aa46c73a0e1526478851e8b24b8fa0751">More...</a><br /></td></tr>
 <tr class="separator:aa46c73a0e1526478851e8b24b8fa0751"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74a3ec45ea351347c2d0dff256279ae8"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a74a3ec45ea351347c2d0dff256279ae8">timestamp</a> (void)</td></tr>
-<tr class="memdesc:a74a3ec45ea351347c2d0dff256279ae8"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Obtencion de fecha con formato sqlite DATETIME"  <a href="#a74a3ec45ea351347c2d0dff256279ae8">More...</a><br /></td></tr>
-<tr class="separator:a74a3ec45ea351347c2d0dff256279ae8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35721dca14dd4d03bc7fa2f57670c4a0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a35721dca14dd4d03bc7fa2f57670c4a0">dbfunc</a> (char *opcion, char *nombredb)</td></tr>
-<tr class="memdesc:a35721dca14dd4d03bc7fa2f57670c4a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Funcion para uso del sqlite"  <a href="#a35721dca14dd4d03bc7fa2f57670c4a0">More...</a><br /></td></tr>
-<tr class="separator:a35721dca14dd4d03bc7fa2f57670c4a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07d2962e36f7cd86b36de0d9e7bcd9ab"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a07d2962e36f7cd86b36de0d9e7bcd9ab">timestamp</a> (int print)</td></tr>
+<tr class="memdesc:a07d2962e36f7cd86b36de0d9e7bcd9ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Obtencion de fecha con formato sqlite DATETIME"  <a href="#a07d2962e36f7cd86b36de0d9e7bcd9ab">More...</a><br /></td></tr>
+<tr class="separator:a07d2962e36f7cd86b36de0d9e7bcd9ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b8f4ce3f53d8341fe7e0c56ad696cea"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a7b8f4ce3f53d8341fe7e0c56ad696cea">dbfunc</a> (int opcion, char *<a class="el" href="../../d0/d29/main_8c.html#a16aba9cd49b38df68a72d1f0d49cb766">nombredb</a>)</td></tr>
+<tr class="memdesc:a7b8f4ce3f53d8341fe7e0c56ad696cea"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Funcion para uso del sqlite"  <a href="#a7b8f4ce3f53d8341fe7e0c56ad696cea">More...</a><br /></td></tr>
+<tr class="separator:a7b8f4ce3f53d8341fe7e0c56ad696cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ac194106572f1d9defbdb34642fa9c6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a4ac194106572f1d9defbdb34642fa9c6">ConfigurarSerie</a> (int fd)</td></tr>
 <tr class="memdesc:a4ac194106572f1d9defbdb34642fa9c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Configura y abre el puerto serie"  <a href="#a4ac194106572f1d9defbdb34642fa9c6">More...</a><br /></td></tr>
 <tr class="separator:a4ac194106572f1d9defbdb34642fa9c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,15 +174,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a83c5d1820d98e6790fd5e333b434f088"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a83c5d1820d98e6790fd5e333b434f088">SendcommSerie</a> (int fd, char *missatgeSerie)</td></tr>
 <tr class="memdesc:a83c5d1820d98e6790fd5e333b434f088"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Enviar mensage por puerto serie : SendcommSerie(int fd, char *missatgeSerie)."  <a href="#a83c5d1820d98e6790fd5e333b434f088">More...</a><br /></td></tr>
 <tr class="separator:a83c5d1820d98e6790fd5e333b434f088"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace562236c7aba9a645385fe701461288"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#ace562236c7aba9a645385fe701461288">recieveCommSerie</a> (int fd, char buf[256])</td></tr>
+<tr class="memitem:ace562236c7aba9a645385fe701461288"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#ace562236c7aba9a645385fe701461288">recieveCommSerie</a> (int fd, char <a class="el" href="../../d0/d29/main_8c.html#a866e3eea299e33d1f7cdc6e46e65835f">buf</a>[256])</td></tr>
 <tr class="memdesc:ace562236c7aba9a645385fe701461288"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Funcion para la recepcion por Serie.  <a href="#ace562236c7aba9a645385fe701461288">More...</a><br /></td></tr>
 <tr class="separator:ace562236c7aba9a645385fe701461288"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad658de9cd5732a9646afe86ea97a5447"><td class="memItemLeft" align="right" valign="top"><a id="ad658de9cd5732a9646afe86ea97a5447"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>menudebug</b> (void)</td></tr>
+<tr class="memitem:ad658de9cd5732a9646afe86ea97a5447"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#ad658de9cd5732a9646afe86ea97a5447">menudebug</a> (void)</td></tr>
+<tr class="memdesc:ad658de9cd5732a9646afe86ea97a5447"><td class="mdescLeft">&#160;</td><td class="mdescRight">Menú para el debug del programa.  <a href="#ad658de9cd5732a9646afe86ea97a5447">More...</a><br /></td></tr>
 <tr class="separator:ad658de9cd5732a9646afe86ea97a5447"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81232165dd9b72696c8d27ecd7ea2e97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a81232165dd9b72696c8d27ecd7ea2e97">adquisicion</a> (int fd, char buf[256])</td></tr>
-<tr class="memdesc:a81232165dd9b72696c8d27ecd7ea2e97"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Adquiere de forma periodica los datos del sensor de temperatura y los almacena en la base de datos."  <a href="#a81232165dd9b72696c8d27ecd7ea2e97">More...</a><br /></td></tr>
-<tr class="separator:a81232165dd9b72696c8d27ecd7ea2e97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aade1be772806bb96cbf72d884ba00eb1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#aade1be772806bb96cbf72d884ba00eb1">adquisicion</a> (int fd, char *accion, int debug, char <a class="el" href="../../d0/d29/main_8c.html#a866e3eea299e33d1f7cdc6e46e65835f">buf</a>[256])</td></tr>
+<tr class="memdesc:aade1be772806bb96cbf72d884ba00eb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Adquiere de forma periodica los datos del sensor de temperatura y los almacena en la base de datos."  <a href="#aade1be772806bb96cbf72d884ba00eb1">More...</a><br /></td></tr>
+<tr class="separator:aade1be772806bb96cbf72d884ba00eb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6745b86fbd6eeec00e183b7fffe894e8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a6745b86fbd6eeec00e183b7fffe894e8">alarm_handler</a> (int signum)</td></tr>
 <tr class="memdesc:a6745b86fbd6eeec00e183b7fffe894e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alarma Timeout comunicacion.  <a href="#a6745b86fbd6eeec00e183b7fffe894e8">More...</a><br /></td></tr>
 <tr class="separator:a6745b86fbd6eeec00e183b7fffe894e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -189,17 +195,17 @@ Variables</h2></td></tr>
 <tr class="memitem:a403285e37450b4db1fd1a7b456ad7921"><td class="memItemLeft" align="right" valign="top"><a id="a403285e37450b4db1fd1a7b456ad7921"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>SerialCommTimeOUT</b></td></tr>
 <tr class="separator:a403285e37450b4db1fd1a7b456ad7921"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d142fe9d4c915dba2208ba262f80dbb"><td class="memItemLeft" align="right" valign="top"><a id="a6d142fe9d4c915dba2208ba262f80dbb"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>AlarmCommTimeOUT</b></td></tr>
+<tr class="memitem:a6d142fe9d4c915dba2208ba262f80dbb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a6d142fe9d4c915dba2208ba262f80dbb">AlarmCommTimeOUT</a></td></tr>
 <tr class="separator:a6d142fe9d4c915dba2208ba262f80dbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16aba9cd49b38df68a72d1f0d49cb766"><td class="memItemLeft" align="right" valign="top"><a id="a16aba9cd49b38df68a72d1f0d49cb766"></a>
-char *&#160;</td><td class="memItemRight" valign="bottom"><b>nombredb</b> = NULL</td></tr>
+<tr class="memitem:a16aba9cd49b38df68a72d1f0d49cb766"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a16aba9cd49b38df68a72d1f0d49cb766">nombredb</a> = NULL</td></tr>
 <tr class="separator:a16aba9cd49b38df68a72d1f0d49cb766"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc97f5054a1b45039965e4ee787abc03"><td class="memItemLeft" align="right" valign="top"><a id="abc97f5054a1b45039965e4ee787abc03"></a>
+struct termios oldtio&#160;</td><td class="memItemRight" valign="bottom"><b>newtio</b></td></tr>
+<tr class="separator:abc97f5054a1b45039965e4ee787abc03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f8059414f0228f0256115e024eeed4b"><td class="memItemLeft" align="right" valign="top"><a id="a6f8059414f0228f0256115e024eeed4b"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
 <tr class="separator:a6f8059414f0228f0256115e024eeed4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a866e3eea299e33d1f7cdc6e46e65835f"><td class="memItemLeft" align="right" valign="top"><a id="a866e3eea299e33d1f7cdc6e46e65835f"></a>
-char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></tr>
+<tr class="memitem:a866e3eea299e33d1f7cdc6e46e65835f"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a866e3eea299e33d1f7cdc6e46e65835f">buf</a> [256]</td></tr>
 <tr class="separator:a866e3eea299e33d1f7cdc6e46e65835f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -208,21 +214,6 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
 <dl class="section date"><dt>Date</dt><dd>"23"/"10"/"2018" Copyright (C) 2012- 2018</dd></dl>
 <p>Version 1.X License GNU/GPL, see COPYING This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a734bbab06e1a9fd2e5522db0221ff6e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a734bbab06e1a9fd2e5522db0221ff6e3">&#9670;&nbsp;</a></span>BAUDRATE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BAUDRATE&#160;&#160;&#160;B9600</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Valor del parameto o </p>
-
-</div>
-</div>
 <a id="af81e429234dedf0f68fbc22501147012"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af81e429234dedf0f68fbc22501147012">&#9670;&nbsp;</a></span>CONST_TEMP</h2>
 
@@ -238,9 +229,24 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
 
 </div>
 </div>
+<a id="ab39fec97d85960796efedec442f38004"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab39fec97d85960796efedec442f38004">&#9670;&nbsp;</a></span>INTERVAL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define INTERVAL&#160;&#160;&#160;3000                           /* number of milliseconds to go off */</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Valor del parameto o </p>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a81232165dd9b72696c8d27ecd7ea2e97"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a81232165dd9b72696c8d27ecd7ea2e97">&#9670;&nbsp;</a></span>adquisicion()</h2>
+<a id="aade1be772806bb96cbf72d884ba00eb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aade1be772806bb96cbf72d884ba00eb1">&#9670;&nbsp;</a></span>adquisicion()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -250,6 +256,18 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>fd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>accion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>debug</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -268,7 +286,14 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
 <p>"Adquiere de forma periodica los datos del sensor de temperatura y los almacena en la base de datos." </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Param description</td><td></td></tr>
+    <tr><td class="paramname">int fd: Descripcion de fichero para puerto Serie</td><td></td></tr>
+    <tr><td class="paramname">char * accion: accion a ejecutar</td><td></td></tr>
+    <tr><td class="paramname">    1 - Solicitud de dato de temperatura.</td><td></td></tr>
+    <tr><td class="paramname">    2 - Encender Ventilador.</td><td></td></tr>
+    <tr><td class="paramname">    3 - Apagar Ventilador.</td><td></td></tr>
+    <tr><td class="paramname">    4 - Solicitar estado de Ventilador.</td><td></td></tr>
+    <tr><td class="paramname">    5 - Solicitud de dato y almacenamiento en sqlite.</td><td></td></tr>
+    <tr><td class="paramname">char * debug: Habilita el menu de Debug</td><td></td></tr>
   </table>
   </dd>
 </dl>
@@ -312,8 +337,6 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>"Pre-conditions" </dd></dl>
-<dl class="section post"><dt>Postcondition</dt><dd>"Post-conditions" </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>"Return of the function" </dd></dl>
 
 </div>
@@ -374,8 +397,8 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
 
 </div>
 </div>
-<a id="a35721dca14dd4d03bc7fa2f57670c4a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35721dca14dd4d03bc7fa2f57670c4a0">&#9670;&nbsp;</a></span>dbfunc()</h2>
+<a id="a7b8f4ce3f53d8341fe7e0c56ad696cea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b8f4ce3f53d8341fe7e0c56ad696cea">&#9670;&nbsp;</a></span>dbfunc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -383,7 +406,7 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
         <tr>
           <td class="memname">int dbfunc </td>
           <td>(</td>
-          <td class="paramtype">char *&#160;</td>
+          <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>opcion</em>, </td>
         </tr>
         <tr>
@@ -411,7 +434,6 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>"Devuelve integer" </dd></dl>
-<p>pasamos el parametro de opcion a integer</p>
 <p>Abrimos la base de datos.</p>
 <p>Tabla de DATOS para datos capturados e información del estado del ventilador</p>
 <p>Insertar datos en la tabla de 'DATOS'</p>
@@ -484,20 +506,49 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
 <p>"Funcion Principal" </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Le pasamos patats, tomates y cebolla</td><td></td></tr>
+    <tr><td class="paramname">""</td><td></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>"Nos devuelve un caldo" </dd></dl>
-<p>Valor del parameto n</p>
+<dl class="section return"><dt>Returns</dt><dd>"" </dd></dl>
+<p>Valor del parameto -d para debug del programa</p>
+<p>Tiempo de adquisicion de muestras por defecto</p>
+<p>ADquisición de los parametros de lanzamiento del programa</p>
+<p>Pendiente agregar opción para la adquisición de la temperatura objetivo a mantener</p>
 <p>Se configura y abre el puerto serie</p>
 <p>Abrir la base de datos con el nombre suministrado y crear las tablas</p>
 <p>Enviamos el parametro para que se inicie la adquisicion de datos.</p>
 <p>Operació 'M' : Marxa / Parada conversió COMANDA: 'A''M' v Temps Temps Núm 'Z' v: (0=parada / 1=marxa) Temps: temps en segons de mostreig (1..20) Núm: Número de mostres fer la mitjana (1..9)</p>
 <p>Esperamos la respuesta del Arduino al mensaje de inicio de adquisicion.</p>
 <p>En caso de no haber error, iniciamos la adquisicion de datos</p>
-<p>En caso de TIMEOUT en la comunicación, reintentamos 3 veces ante de salir</p>
-<p>Se puede habilitar variable y opcion de incio para el numero de reintentos </p>
+<p>si la opcion de debug está activada, sacara el menu por pantalla </p>
+
+</div>
+</div>
+<a id="ad658de9cd5732a9646afe86ea97a5447"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad658de9cd5732a9646afe86ea97a5447">&#9670;&nbsp;</a></span>menudebug()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int menudebug </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Menú para el debug del programa. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Param description</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>"Return of the function" </dd></dl>
 
 </div>
 </div>
@@ -602,7 +653,7 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>"void"char buf[256] : Variable global para el almacenamiento de los mensajes recibidos por puerto Serie. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>"void" </dd></dl>
 <p>EL parametro TCSANOW implica que la accion se realiaz de forma inmediata </p>
 
 </div>
@@ -638,8 +689,8 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
 
 </div>
 </div>
-<a id="a74a3ec45ea351347c2d0dff256279ae8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74a3ec45ea351347c2d0dff256279ae8">&#9670;&nbsp;</a></span>timestamp()</h2>
+<a id="a07d2962e36f7cd86b36de0d9e7bcd9ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07d2962e36f7cd86b36de0d9e7bcd9ab">&#9670;&nbsp;</a></span>timestamp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -647,8 +698,8 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
         <tr>
           <td class="memname">char* timestamp </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>print</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -662,6 +713,52 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>buf</b> [256]</td></t
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>"Devuelve puntero a un string con la fecha" </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a6d142fe9d4c915dba2208ba262f80dbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d142fe9d4c915dba2208ba262f80dbb">&#9670;&nbsp;</a></span>AlarmCommTimeOUT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int AlarmCommTimeOUT</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Flag de timeout </p>
+
+</div>
+</div>
+<a id="a866e3eea299e33d1f7cdc6e46e65835f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a866e3eea299e33d1f7cdc6e46e65835f">&#9670;&nbsp;</a></span>buf</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char buf[256]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>&lt; char buf[256] : Variable global para el almacenamiento de los mensajes recibidos por puerto Serie. </p>
+
+</div>
+</div>
+<a id="a16aba9cd49b38df68a72d1f0d49cb766"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a16aba9cd49b38df68a72d1f0d49cb766">&#9670;&nbsp;</a></span>nombredb</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* nombredb = NULL</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Flag de Alarma de tiemout activada </p>
 
 </div>
 </div>

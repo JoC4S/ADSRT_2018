@@ -39,19 +39,25 @@
 #define COLOR_RED "\x1B[31m"
 #define COLOR_YELLOW "\x1B[33m"
 #define COLOR_RESET "\033[0m"
-#define PIN_VENTILADOR "03"     		/** Pin de Arduino que activa el ventilador*/
-#define CONST_TEMP 0.048        		/*!< Constante de ttemperatura para el sensor mV * nivel. */
-#define TIMEOUT_TEMP 3				/** Tiempo en segundos para provocar un error de timeout*/
-int SerialCommTimeOUT;				/** Flag de timeout*/
-int AlarmCommTimeOUT;				/** Flag de Alarma de tiemout activada*/
-char *nombredb = NULL;          		/** Valor del parameto o*/
+#define PIN_VENTILADOR "03"                     /** Pin de Arduino que activa el ventilador*/
+#define CONST_TEMP 0.048                        /*!< Constante de ttemperatura para el sensor mV * nivel. */
+#define TIMEOUT_TEMP 3                          /** Tiempo en segundos para provocar un error de timeout*/
+#define TIME_ADQ 5
+int SerialCommTimeOUT;                          /** Flag de timeout*/
+int AlarmCommTimeOUT;                           /** Flag de Alarma de tiemout activada*/
+char *nombredb = NULL;                          /** Valor del parameto o*/
+
+#define INTERVAL 3000                           /* number of milliseconds to go off */
 
 // Variables para configuracion puerto Serie y la fucnion de commSerie
-#define BAUDRATE B9600				/** Velocidad de transferecnia en comunicacion serie.*/
-//#define MODEMDEVICE "/dev/ttyS0"       	//Conexió IGEP - Arduino
-#define MODEMDEVICE "/dev/ttyACM0"      	// Conexió directa PC(Linux) - Arduino
+#define BAUDRATE B9600                          /** Velocidad de transferecnia en comunicacion serie.*/
+//#define MODEMDEVICE "/dev/ttyS0"              //Conexió IGEP - Arduino
+#define MODEMDEVICE "/dev/ttyACM0"              // Conexió directa PC(Linux) - Arduino
+struct termios oldtio, newtio;
 
-int fd = 0;                             	//File Descriptor para el puerto Serie
+int fd = 0;                                     //File Descriptor para el puerto Serie
+/*!< char buf[256] : Variable global para el almacenamiento de los mensajes recibidos por puerto Serie. */
+char buf[256];
 
 /** Declaración de funciones*/
 int fanOnOff (char *estado);
@@ -62,7 +68,7 @@ float temperatura ();
    \param "No tiene parametros"
    \return "Devuelve puntero a un string con la fecha"
  */
-char* timestamp(void)
+char* timestamp(int print)
 {
 	time_t rawtime;
 	struct tm *info;
@@ -85,7 +91,8 @@ char* timestamp(void)
 	//     int tm_isdst;       /* daylight saving time */
 	//};
 	strftime(buffer,80,"%Y-%m-%d %H:%M:%S", info);
-	//printf("Formatted date & time : %s\n", buffer );
+	if (print)
+		printf(COLOR_YELLOW "%s" COLOR_RESET, buffer );
 	retp = buffer;
 	return retp;
 }
@@ -113,14 +120,13 @@ static int callback(void *data, int argc, char **argv, char **azColName)
    \param "Opción = 3 : Insertar datos adquiridos."
    \return "Devuelve integer"
  */
-int dbfunc(char *opcion, char *nombredb)
+int dbfunc(int opcion, char *nombredb)
 {
 	sqlite3 *db;
 	sqlite3_stmt *stmt;
 	char *zErrMsg = 0;
 	int rc;
-	/** pasamos el parametro de opcion a integer*/
-	int c = atoi(opcion);
+	int c = opcion;
 	char *sql = NULL;
 	const char* data = "Callback function called\n\n";
 	char horamuestreo[20];
@@ -143,16 +149,19 @@ int dbfunc(char *opcion, char *nombredb)
 	switch (c) {
 
 	case 1: /** Tabla de DATOS para datos capturados e información del estado del ventilador*/
+		//strcpy(sql,"CREATE TABLE DATOS (HORA DATETIME  NOT NULL,TEMPERATURA FLOAT NOT NULL, VENTILADOR INT NOT NULL);");
+		//strcpy(sql,"CREATE TABLE ALARMAS (HORA DATETIME  NOT NULL, TEMP_FAN_ON INT NOT NULL);");
 		sql = "CREATE TABLE DATOS (HORA DATETIME  NOT NULL,TEMPERATURA FLOAT NOT NULL, VENTILADOR INT NOT NULL);" \
 		      "CREATE TABLE ALARMAS (HORA DATETIME  NOT NULL, TEMP_FAN_ON INT NOT NULL);";
 		printf(" |--->Crear tabla 'DATOS'.\n");
 		printf(" |--->Crear tabla 'ALARMAS'.\n");
 		break;
-	case 2: /** Insertar datos en la tabla de 'DATOS'*/
+	case 2:
+		/** Insertar datos en la tabla de 'DATOS'*/
 		/** Utilizamos 'sqlite3_prepare' para insertar los datos a partir de variables.*/
 		/** ?1 : Hora del sistema a la que se registra la muestra*/
 		/** ?2: Muestra del dato de temperatura registrado*/
-		strcpy(horamuestreo,timestamp());
+		strcpy(horamuestreo,timestamp(0));
 		mustratemperatura = temperatura();
 		fanstatus = fanOnOff("2");
 		sqlite3_prepare_v2(db, "insert into DATOS (HORA, TEMPERATURA, VENTILADOR) values (?1, ?2, ?3);", -1, &stmt, NULL);
@@ -167,7 +176,7 @@ int dbfunc(char *opcion, char *nombredb)
 			printf("\nIntroducidos en tabla 'DATOS:'\n" );
 			printf("----> Timestamp: %s'\n", horamuestreo );
 			printf("----> Temperatura: %2.2f ºC'\n",mustratemperatura);
-			printf("----> Estado Ventilador: %d'\n\n",fanstatus);
+			printf("----> Estado Ventilador: %d'\n",fanstatus);
 		}
 		sqlite3_finalize(stmt);
 		break;
@@ -200,10 +209,8 @@ int dbfunc(char *opcion, char *nombredb)
    \return "Return of the function"
  */
 
-
-
-int ConfigurarSerie(int fd){
-	struct termios oldtio, newtio;
+int ConfigurarSerie(int fd)
+{
 
 	fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY);
 	if (fd < 0) {
@@ -257,8 +264,7 @@ void TancarSerie(int fd)
 		printf(COLOR_GREEN "\nPuerto serie cerrado: '/dev/ttyACM0'.\n");
 	}
 }
-/*!< char buf[256] : Variable global para el almacenamiento de los mensajes recibidos por puerto Serie. */
-char buf[256];
+
 /*!
    \brief "Enviar mensage por puerto serie : SendcommSerie(int fd, char *missatgeSerie)."
    \param "int fd: Descripción de puerto serie ; char *missatgeSerie : Mensage a enviar."
@@ -296,7 +302,7 @@ int recieveCommSerie(int fd, char buf[256])
 	int receiveState = 0;
 	int delay = 0;
 	/** set up alarm handler */
-	signal(SIGALRM, alarm_SerialCommtimeout);
+	//signal(SIGALRM, alarm_SerialCommtimeout);
 	AlarmCommTimeOUT= 1;
 	SerialCommTimeOUT = 0;
 
@@ -304,7 +310,7 @@ int recieveCommSerie(int fd, char buf[256])
 	// Se borra el buffer Serie antes de iniciar la recepción.
 	memset(buf, '\0', 256);
 	/** Configuracion de la Alarma*/
-	alarm(TIMEOUT_TEMP);
+	//alarm(TIMEOUT_TEMP);
 	// Leemos el buffer de entrada de uno en uno hasta tener un mensaje completo.
 	while (!bytes) {
 		usleep(sleeptime);
@@ -334,10 +340,17 @@ int recieveCommSerie(int fd, char buf[256])
 	printf(COLOR_RESET "\n");
 	return receiveState;
 }
-int menudebug(void){
+
+/*!
+   \brief Menú para el debug del programa.
+   \param "Param description"
+   \return "Return of the function"
+ */
+int menudebug(void)
+{
 
 	int opcion = 0;
-	printf(COLOR_YELLOW  "\n-------------------------\n");
+	printf(COLOR_YELLOW  "-------------------------\n");
 	printf("Opciones:\n");
 	printf("-------------------------\n");
 	printf("1- Solicitar temperatura.\n");
@@ -360,8 +373,8 @@ int menudebug(void){
    \pre "PIN_VENTILADOR comprendido entre 0 y 13."
    \return "int OnOff: 1= Ventilador encendido, 2=Ventilador apagado."
  */
-int fanOnOff (char *fan){
-
+int fanOnOff (char *fan)
+{
 	char orden[7] = "\0";
 	int OnOff;
 	/** Activa o desactiva el ventilador*/
@@ -388,6 +401,10 @@ int fanOnOff (char *fan){
 		SendcommSerie(fd, orden);
 		recieveCommSerie(fd,buf);
 		OnOff = (buf[3] -48);
+		if (OnOff)
+		 	printf("|---> Ventilador ON.\n" );
+		else
+			printf("|---> Ventilador OFF.\n");
 		/** Se borra el ultimo msg recibido y el buffer Serie de entrada*/
 		memset(buf, '\0', 256);
 		tcflush(fd,TCIOFLUSH);
@@ -402,8 +419,8 @@ int fanOnOff (char *fan){
    \post "Post-conditions"
    \return "float muestratemperatura"
  */
-float temperatura (){
-
+float temperatura ()
+{
 	char orden[7] = "\0";
 	int i;
 	char tmp[6] = "\0";
@@ -434,18 +451,27 @@ float temperatura (){
 }
 /*!
    \brief "Adquiere de forma periodica los datos del sensor de temperatura y los almacena en la base de datos."
-   \param "Param description"
+   \param "int fd: Descripcion de fichero para puerto Serie"
+   \param "char * accion: accion a ejecutar"
+   \param "	1 - Solicitud de dato de temperatura."
+   \param "	2 - Encender Ventilador."
+   \param "	3 - Apagar Ventilador."
+   \param "	4 - Solicitar estado de Ventilador."
+   \param "	5 - Solicitud de dato y almacenamiento en sqlite."
+   \param "char * debug: Habilita el menu de Debug"
    \pre "El peurto de comunicación serie debe estar abierto."
    \pre "La base de datos debe estar previamente creada."
    \return "Return of the function"
  */
-
-int adquisicion (int fd, char buf[256]){
-
-	int i;
+int adquisicion (int fd, char * accion, int debug, char buf[256])
+{
+	int i = 0;
 	char orden[7] = "\0";
 	while (1) {
-		i = menudebug();
+		if (debug) {
+			i = menudebug();
+		} else
+			i = atoi(accion);
 		switch (i) {
 		case 1:         /** Solicitar TEMPERATURA*/
 			temperatura();
@@ -460,7 +486,7 @@ int adquisicion (int fd, char buf[256]){
 			fanOnOff("2");
 			break;
 		case 5:         /** LLena la base de sqlite con la info de temperatura solicitada */
-			dbfunc("2", nombredb);
+			dbfunc(2, nombredb);
 			break;
 		case 6:         /** Solicita un cambio en el Searial.readtimeout de Arduino*/
 			        /** Esto provoca el fallo de Serial tiemout al no responder*/
@@ -477,47 +503,50 @@ int adquisicion (int fd, char buf[256]){
 			exit(1);
 		}
 	}
+	return 1;
 }
 /*!
    \brief Alarma Timeout comunicacion.
    \param "Param description"
-   \pre "Pre-conditions"
-   \post "Post-conditions"
    \return "Return of the function"
  */
-void alarm_handler(int signum){
+void alarm_handler(int signum)
+{
 	printf("Comunicación timeout\n");
 	SerialCommTimeOUT = 1;
 }
-
 /*!
    \brief "Funcion Principal"
-   \param "Le pasamos patats, tomates y cebolla"
-   \return "Nos devuelve un caldo"
+   \param ""
+   \return ""
  */
 int main(int argc, char *argv[])
 {
-	char *dvlaue = NULL;                             /** Valor del parameto n*/
+	int  dvalue = 0;
+	char *accion = NULL;                           /** Valor del parameto -d para debug del programa*/
+	char tvalue = TIME_ADQ;				/** Tiempo de adquisicion de muestras por defecto*/
 	int index;
 	int c;
 
-	/** Se configura y abre el puerto serie*/
-	fd = ConfigurarSerie(fd);
-
-	while ((c = getopt(argc, argv, "n:hd")) != -1) {
+	/** ADquisición de los parametros de lanzamiento del programa*/
+	/** Pendiente agregar opción para la adquisición de la temperatura objetivo a mantener*/
+	while ((c = getopt(argc, argv, "n:t:hd")) != -1) {
 		switch (c) {
 		case 'n':
 			nombredb = optarg;
 			break;
 		case 'd':
-			dvlaue = optarg;
+			dvalue = 1;
+			break;
+		case 't':
+			tvalue = atoi(optarg);
 			break;
 		case 'h':
-			printf("\nUso: main [opciones] archivo...\n");
-			printf("\n-n	Nombre base de datos. Precisa 'nombre_base_datos.db'\n");
-			printf("-t	Tiempo de muestreo. Default = 1s.\n\n");
-			printf("-m	Nº Muestras para hacer la media. Default = 3.\n\n");
-			printf("-d	Modo Debug. Para menu de opciones.\n\n");
+			printf("\nUso: main [opciones] -n [nombre_archivo.db]...\n\n");
+			printf("-n [nombre.db]	Nombre base de datos. Precisa 'nombre_base_datos.db'\n");
+			printf("-t [seg]	Tiempo de muestreo en sgundos. Default = 5s.\n\n");
+			printf("-m [int]	Nº Muestras para hacer la media. Default = 3.\n\n");
+			printf("-d 		Modo Debug. Para menu de opciones.\n\n");
 			exit(1);
 		case '?':
 			if (optopt == 'n' ) {
@@ -540,8 +569,10 @@ int main(int argc, char *argv[])
 		printf("Se necesitan parametros. Usar -h para Ayuda.\n");
 		exit(1);
 	}
+	/** Se configura y abre el puerto serie*/
+	fd = ConfigurarSerie(fd);
 	/** Abrir la base de datos con el nombre suministrado y crear las tablas*/
-	dbfunc("1", nombredb);
+	dbfunc(1, nombredb);
 	/** Enviamos el parametro para que se inicie la adquisicion de datos.*/
 	/**Operació 'M'
 	   : Marxa / Parada conversió
@@ -549,22 +580,25 @@ int main(int argc, char *argv[])
 	        v:      (0=parada / 1=marxa)
 	        Temps:  temps en segons de mostreig (1..20)
 	        Núm:    Número de mostres fer la mitjana (1..9)	*/
-	printf("Iniciando proceso de adquisición.\n");
-	SendcommSerie(fd, "AM1011Z");
+	printf("Arrancando proceso de toma de temperatura en Arduino.\n");
+	char arranque [] = "AM1013Z";
+	SendcommSerie(fd, arranque);
 	/** Esperamos la respuesta del Arduino al mensaje de inicio de adquisicion.*/
+	recieveCommSerie(fd, buf);
+
 	/** En caso de no haber error, iniciamos la adquisicion de datos*/
-	/** En caso de TIMEOUT en la comunicación, reintentamos 3 veces ante de salir*/
-	/** Se puede habilitar variable y opcion de incio para el numero de reintentos*/
-	while (1) {
-		if (!recieveCommSerie(fd, buf)) {
-			printf("Vovler a intentar comunicacion (y/n)?: ");
-			c = getchar();
-			if (c != 'y') {
-				c = 'n';
-				break;
-			}
-		}else
-			adquisicion(fd, buf);
+	/** si la opcion de debug está activada, sacara el menu por pantalla*/
+	/*Si no hay modo debug, solicitara muestras cada tvalue */
+	if (dvalue){
+		printf("Entrando en modo Debug....\n" );
+		adquisicion(fd, accion, dvalue, buf);
+	}else{
+		c = 0;
+		while(!c){
+			timestamp(1);
+			c = dbfunc(2, nombredb);
+			sleep(tvalue);
+		}
 	}
 	TancarSerie(fd);
 	return 0;

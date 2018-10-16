@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['buf',['buf',['../d0/d29/main_8c.html#a866e3eea299e33d1f7cdc6e46e65835f',1,'main.c']]]
+  ['alarmcommtimeout',['AlarmCommTimeOUT',['../d0/d29/main_8c.html#a6d142fe9d4c915dba2208ba262f80dbb',1,'main.c']]]
 ];
