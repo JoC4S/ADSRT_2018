@@ -40,11 +40,17 @@
 #define COLOR_YELLOW "\x1B[33m"
 #define COLOR_RESET "\033[0m"
 #define PIN_VENTILADOR "03"                     /** Pin de Arduino que activa el ventilador*/
-#define CONST_TEMP 0.048                        /*!< Constante de ttemperatura para el sensor mV * nivel. */
+#define CONST_TEMP 0.04883                       /*!< Constante de ttemperatura para el sensor mV * nivel. */
 #define TIMEOUT_TEMP 3                          /** Tiempo en segundos para provocar un error de timeout*/
 #define TIME_ADQ 5
-int SerialCommTimeOUT;                          /** Flag de timeout*/
-int AlarmCommTimeOUT;                           /** Flag de Alarma de tiemout activada*/
+#define FAN_ON "1"
+#define FAN_OFF "0"
+#define FAN_STATUS "2"
+#define CREATE_DB 1
+#define CONSINA_TEMP 15.0
+
+float ultimaTemperatura;                        /** valor de la ultima muestra de temperatura adquirida*/
+int alarmTemp;                                  /** Numero de veces en que no se ha conseguido controlar la temperatura*/
 char *nombredb = NULL;                          /** Valor del parameto o*/
 
 #define INTERVAL 3000                           /* number of milliseconds to go off */
@@ -112,6 +118,38 @@ static int callback(void *data, int argc, char **argv, char **azColName)
 	printf("\n");
 	return 0;
 }
+
+/*!
+   \brief "Comprueba que la temperatura este siendo controlada."
+   \brief "Se le pasa el ultimo dato de temperatura. En caso de llevar 5 tomas de temperatura"
+   \brief "seguidas sobrepasando la consigna, se realiza una inserción de alarma en la tabal de alarmas sqlite"
+   \param "Param description"
+   \pre "Pre-conditions"
+   \post "Post-conditions"
+   \return "Return of the function"
+ */
+int controlTemp (float ultimatemperatura, int fanstatus){
+
+	float consignaTemp = 20.0;
+
+	if (ultimatemperatura > consignaTemp) {
+		if (fanstatus) {
+			printf("El ventildaor ya esta encendido!\n");
+			alarmTemp++;
+		}else{
+			fanOnOff("1");
+			printf("|-----> Se activa el ventilador.\n" );
+		}
+	}else{
+		alarmTemp = 0;
+		if (fanstatus)
+			fanOnOff("0");
+	}
+	if (alarmTemp == 5) {
+		/* Introducir alarma en sql*/
+	}
+
+}
 /*!
    \brief "Funcion para uso del sqlite"
    \param "Pasamos opcion y nombre de la base de datos."
@@ -127,6 +165,7 @@ int dbfunc(int opcion, char *nombredb)
 	char *zErrMsg = 0;
 	int rc;
 	int c = opcion;
+	float consignaTemp = 15.0;
 	char *sql = NULL;
 	const char* data = "Callback function called\n\n";
 	char horamuestreo[20];
@@ -163,11 +202,47 @@ int dbfunc(int opcion, char *nombredb)
 		/** ?2: Muestra del dato de temperatura registrado*/
 		strcpy(horamuestreo,timestamp(0));
 		mustratemperatura = temperatura();
-		fanstatus = fanOnOff("2");
+		fanstatus = fanOnOff(FAN_STATUS);
+		/** Comprobacion de alarma de TEMPERATURA*/
+		if (mustratemperatura > consignaTemp) {
+			if (fanstatus) {
+				printf("El ventildaor ya esta encendido!\n");
+				alarmTemp++;
+				printf("Alarmas de temperatura: %d\n", alarmTemp);
+			}else{
+				fanOnOff(FAN_ON);
+				printf("|-----> Se activa el ventilador.\n" );
+			}
+		}else{
+			alarmTemp = 0;
+			if (fanstatus)
+				fanOnOff(FAN_OFF);
+		}
+		/** Prepara los datos comunes para las tablas DATOS y ALARMAS.*/
+
+		/** En caso de llevar 5 veces seguidas con el ventilador encendido, se introducira el dato en ALARMA*/
+		if (alarmTemp >= 3) {/* Preparar datos para tabla de ALARMA en sql*/
+			sqlite3_prepare_v2(db, "insert into ALARMAS (HORA, TEMP_FAN_ON) values (?1, ?2);", -1, &stmt, NULL);
+			sqlite3_bind_text(stmt, 1, horamuestreo, -1, SQLITE_STATIC);
+			sqlite3_bind_int(stmt, 2, alarmTemp);
+			/** Finalizamos la creación del statement para el sqlite y finalizamos cargandolo en la base de datos.*/
+			rc = sqlite3_step(stmt);
+			if (rc != SQLITE_DONE) {
+				printf("ERROR inserting data: %s\n", sqlite3_errmsg(db));
+			}
+			else {
+				printf("\nIntroducidos en tabla" COLOR_RED "'ALARMAS:'\n"COLOR_RESET );
+				printf("----> Timestamp: %s'\n", horamuestreo );
+				printf("----> Tiempo vent. encendido: %d min'\n",alarmTemp);
+			}
+			sqlite3_finalize(stmt);
+		}
+		/** Prepara los datos para rellenar la tabla DATOS*/
 		sqlite3_prepare_v2(db, "insert into DATOS (HORA, TEMPERATURA, VENTILADOR) values (?1, ?2, ?3);", -1, &stmt, NULL);
 		sqlite3_bind_text(stmt, 1, horamuestreo, -1, SQLITE_STATIC);
 		sqlite3_bind_double(stmt, 2, mustratemperatura);
 		sqlite3_bind_int(stmt, 3, fanstatus);
+		/** Finalizamos la creación del statement para el sqlite y finalizamos cargandolo en la base de datos.*/
 		rc = sqlite3_step(stmt);
 		if (rc != SQLITE_DONE) {
 			printf("ERROR inserting data: %s\n", sqlite3_errmsg(db));
@@ -185,7 +260,8 @@ int dbfunc(int opcion, char *nombredb)
 		//sql = "SELECT * from DATOS";
 		break;
 
-	case 4:
+	case 4:/** Insercion de datos en tabla de ALARMAS*/
+
 		break;
 	default:
 		printf("Ninguna acción a realizar con la base de datos.\n");
@@ -199,7 +275,7 @@ int dbfunc(int opcion, char *nombredb)
 		sqlite3_free(zErrMsg);
 	}
 	sqlite3_close(db);
-	printf("Base de datos cerrada.\n");
+	printf("Base de datos cerrada.\n\n");
 	return 0;
 }
 
@@ -234,20 +310,6 @@ int ConfigurarSerie(int fd)
 	tcsetattr(fd, TCSANOW, &newtio);
 	sleep(1); //Per donar temps a que l'Arduino es recuperi del RESET
 	return fd;
-}
-/*!
-   \brief "Funcion de trigger del flag alarma de tiempo de comunicacion Serie excedido."
-   \param "Param description"
-   \pre "Pre-conditions"
-   \post "Post-conditions"
-   \return "Return of the function"
- */
-void alarm_SerialCommtimeout(int signum){
-
-	if (AlarmCommTimeOUT) {
-		SerialCommTimeOUT = 1;
-		fprintf(stderr, COLOR_RED "\nSerial Comm TIMEOUT!!\n" COLOR_RESET );
-	}
 }
 /*!
    \brief "Cierra el puerto Serie"
@@ -300,44 +362,49 @@ int recieveCommSerie(int fd, char buf[256])
 {
 	int i = 0, bytes = 0;
 	int receiveState = 0;
-	int delay = 0;
-	/** set up alarm handler */
-	//signal(SIGALRM, alarm_SerialCommtimeout);
-	AlarmCommTimeOUT= 1;
-	SerialCommTimeOUT = 0;
-
-	useconds_t sleeptime = 60000; /** Tiempo en microsegundos*/
+	int c = 0;
+	/** conf SELECT*/
+	fd_set rfds;
+	struct timeval tv;
+	int retval;
 	// Se borra el buffer Serie antes de iniciar la recepción.
 	memset(buf, '\0', 256);
-	/** Configuracion de la Alarma*/
-	//alarm(TIMEOUT_TEMP);
-	// Leemos el buffer de entrada de uno en uno hasta tener un mensaje completo.
-	while (!bytes) {
-		usleep(sleeptime);
-		delay = delay + sleeptime;
-		if (SerialCommTimeOUT) {
-			receiveState = 0;
-			break;
+	tcflush(fd, TCIFLUSH);
+
+	/* Watch stdin (fd 0) to see when it has input. */
+	FD_ZERO(&rfds);
+	FD_SET(fd, &rfds);
+	/* Wait up to five seconds. */
+	tv.tv_sec = 2;
+	tv.tv_usec = 0;
+
+	retval = select(fd+1, &rfds, NULL, NULL, &tv);
+	/* Don’t rely on the value of tv now! */
+	if (retval == -1)
+		perror("select()");
+	else if (retval) {
+		/** Data is available now*/
+		if (FD_ISSET(fd, &rfds)) {               /* will be true. */
+			while (!bytes) {
+				ioctl(fd, FIONREAD, &bytes);
+				while (bytes > 0) {
+					read(fd, buf + i, 1);
+					bytes--;
+					i++;
+				}
+				/** Si tenemos ocurre un timeout, sa sale de la función, dando error*/
+				if (buf[0] == 'A' && (buf[3] == 'Z' || buf[4] == 'Z' || buf[7] == 'Z')) {
+					printf(COLOR_YELLOW "\n%s ", buf);
+					printf(COLOR_GREEN "<-- :Recibido Serie %ld bytes.\n" COLOR_RESET, strlen(buf));
+					receiveState = 0;
+					break;
+				}
+			}
 		}
-		ioctl(fd, FIONREAD, &bytes);
-		while (bytes > 0) {
-			read(fd, buf + i, 1);
-			bytes--;
-			i++;
-		}
-		/** Si tenemos ocurre un timeout, sa sale de la función, dando error*/
-		if (buf[0] == 'A' && (buf[3] == 'Z' || buf[4] == 'Z' || buf[7] == 'Z')) {
-			AlarmCommTimeOUT = 0;
-			printf(COLOR_YELLOW "\n%s ", buf);
-			printf(COLOR_GREEN "<-- :Recibido Serie %ld bytes.\n", strlen(buf));
-			printf(COLOR_RESET);
-			receiveState = 1;
-			break;
-		}
-		printf("\rEsperando mensaje entrante (delay = %i us)...",delay);
-		fflush(stdout);
+	}else{
+		printf("No data within five seconds.\n");
 	}
-	printf(COLOR_RESET "\n");
+	tcflush(fd, TCIFLUSH);
 	return receiveState;
 }
 
@@ -371,7 +438,7 @@ int menudebug(void)
    \brief "Enciende/Apaga el Ventilador o solicita informacion de su estado."
    \param "char * estado: 1- Encender, 0- Apagar, 2 - Solicitar estado"
    \pre "PIN_VENTILADOR comprendido entre 0 y 13."
-   \return "int OnOff: 1= Ventilador encendido, 2=Ventilador apagado."
+   \return "int OnOff: 1= Ventilador encendido, 0=Ventilador apagado."
  */
 int fanOnOff (char *fan)
 {
@@ -402,7 +469,7 @@ int fanOnOff (char *fan)
 		recieveCommSerie(fd,buf);
 		OnOff = (buf[3] -48);
 		if (OnOff)
-		 	printf("|---> Ventilador ON.\n" );
+			printf("|---> Ventilador ON.\n" );
 		else
 			printf("|---> Ventilador OFF.\n");
 		/** Se borra el ultimo msg recibido y el buffer Serie de entrada*/
@@ -467,7 +534,8 @@ int adquisicion (int fd, char * accion, int debug, char buf[256])
 {
 	int i = 0;
 	char orden[7] = "\0";
-	while (1) {
+	int bucle = 0;
+	while (!bucle) {
 		if (debug) {
 			i = menudebug();
 		} else
@@ -499,22 +567,13 @@ int adquisicion (int fd, char * accion, int debug, char buf[256])
 			break;
 		case 7:         /** Salir del programa*/
 			printf("Saliendo de programa.\n");
-			TancarSerie(fd);
-			exit(1);
+			bucle = 1;
+			break;
 		}
 	}
 	return 1;
 }
-/*!
-   \brief Alarma Timeout comunicacion.
-   \param "Param description"
-   \return "Return of the function"
- */
-void alarm_handler(int signum)
-{
-	printf("Comunicación timeout\n");
-	SerialCommTimeOUT = 1;
-}
+
 /*!
    \brief "Funcion Principal"
    \param ""
@@ -522,9 +581,9 @@ void alarm_handler(int signum)
  */
 int main(int argc, char *argv[])
 {
-	int  dvalue = 0;
+	int dvalue = 0;
 	char *accion = NULL;                           /** Valor del parameto -d para debug del programa*/
-	char tvalue = TIME_ADQ;				/** Tiempo de adquisicion de muestras por defecto*/
+	char tvalue = TIME_ADQ;                         /** Tiempo de adquisicion de muestras por defecto*/
 	int index;
 	int c;
 
@@ -546,7 +605,7 @@ int main(int argc, char *argv[])
 			printf("-n [nombre.db]	Nombre base de datos. Precisa 'nombre_base_datos.db'\n");
 			printf("-t [seg]	Tiempo de muestreo en sgundos. Default = 5s.\n\n");
 			printf("-m [int]	Nº Muestras para hacer la media. Default = 3.\n\n");
-			printf("-d 		Modo Debug. Para menu de opciones.\n\n");
+			printf("-d              Modo Debug. Para menu de opciones.\n\n");
 			exit(1);
 		case '?':
 			if (optopt == 'n' ) {
@@ -572,7 +631,7 @@ int main(int argc, char *argv[])
 	/** Se configura y abre el puerto serie*/
 	fd = ConfigurarSerie(fd);
 	/** Abrir la base de datos con el nombre suministrado y crear las tablas*/
-	dbfunc(1, nombredb);
+	dbfunc(CREATE_DB, nombredb);
 	/** Enviamos el parametro para que se inicie la adquisicion de datos.*/
 	/**Operació 'M'
 	   : Marxa / Parada conversió
@@ -589,17 +648,23 @@ int main(int argc, char *argv[])
 	/** En caso de no haber error, iniciamos la adquisicion de datos*/
 	/** si la opcion de debug está activada, sacara el menu por pantalla*/
 	/*Si no hay modo debug, solicitara muestras cada tvalue */
-	if (dvalue){
+	if (dvalue) {
 		printf("Entrando en modo Debug....\n" );
 		adquisicion(fd, accion, dvalue, buf);
 	}else{
 		c = 0;
-		while(!c){
+		while(!c) {
 			timestamp(1);
 			c = dbfunc(2, nombredb);
 			sleep(tvalue);
 		}
 	}
+	/** Apagamos ciclo de recoleccion de datos en Arduino.*/
+	strcpy(arranque, "AM0013Z");
+	SendcommSerie(fd, arranque);
+	/** Esperamos la respuesta del Arduino al mensaje de inicio de adquisicion.*/
+	recieveCommSerie(fd, buf);
+	/** Cerramos puerto Serie.*/
 	TancarSerie(fd);
 	return 0;
 }
