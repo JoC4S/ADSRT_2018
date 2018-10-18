@@ -46,8 +46,10 @@
 #define FAN_ON "1"
 #define FAN_OFF "0"
 #define FAN_STATUS "2"
-#define CREATE_DB 1
+#define CREATE_DB 1				/** Para función dbfunc(). Indica la solicitud  de creacion de la base de datos-*/
 #define CONSINA_TEMP 15.0
+#define PRINT_TIME 1				/** Para funcion timestamp(). Idica que se imprimira la hora por patnalla.*/
+#define ADQUISICION_DATOS_PERIODICA 2
 
 float ultimaTemperatura;                        /** valor de la ultima muestra de temperatura adquirida*/
 int alarmTemp;                                  /** Numero de veces en que no se ha conseguido controlar la temperatura*/
@@ -183,6 +185,7 @@ int dbfunc(int opcion, char *nombredb)
 			return 1;
 		}
 		else
+			timestamp(PRINT_TIME);
 			printf("---> Base de datos abierta con exito.\n");
 	}
 	switch (c) {
@@ -275,7 +278,8 @@ int dbfunc(int opcion, char *nombredb)
 		sqlite3_free(zErrMsg);
 	}
 	sqlite3_close(db);
-	printf("Base de datos cerrada.\n\n");
+	timestamp(PRINT_TIME);
+	printf("---> Base de datos cerrada.\n\n");
 	return 0;
 }
 
@@ -378,6 +382,7 @@ int recieveCommSerie(int fd, char buf[256])
 	tv.tv_sec = 2;
 	tv.tv_usec = 0;
 
+	printf("Esperando respuesta...\n" );
 	retval = select(fd+1, &rfds, NULL, NULL, &tv);
 	/* Don’t rely on the value of tv now! */
 	if (retval == -1)
@@ -386,6 +391,7 @@ int recieveCommSerie(int fd, char buf[256])
 		/** Data is available now*/
 		if (FD_ISSET(fd, &rfds)) {               /* will be true. */
 			while (!bytes) {
+				usleep(100000);
 				ioctl(fd, FIONREAD, &bytes);
 				while (bytes > 0) {
 					read(fd, buf + i, 1);
@@ -394,7 +400,7 @@ int recieveCommSerie(int fd, char buf[256])
 				}
 				/** Si tenemos ocurre un timeout, sa sale de la función, dando error*/
 				if (buf[0] == 'A' && (buf[3] == 'Z' || buf[4] == 'Z' || buf[7] == 'Z')) {
-					printf(COLOR_YELLOW "\n%s ", buf);
+					printf(COLOR_YELLOW "%s ", buf);
 					printf(COLOR_GREEN "<-- :Recibido Serie %ld bytes.\n" COLOR_RESET, strlen(buf));
 					receiveState = 0;
 					break;
@@ -402,9 +408,9 @@ int recieveCommSerie(int fd, char buf[256])
 			}
 		}
 	}else{
-		printf("No data within five seconds.\n");
+		printf(COLOR_RED"No data within %d seconds.\n" COLOR_RESET,TIMEOUT_TEMP);
 	}
-	tcflush(fd, TCIFLUSH);
+	tcflush(fd,TCIOFLUSH);
 	return receiveState;
 }
 
@@ -649,13 +655,12 @@ int main(int argc, char *argv[])
 	/** si la opcion de debug está activada, sacara el menu por pantalla*/
 	/*Si no hay modo debug, solicitara muestras cada tvalue */
 	if (dvalue) {
-		printf("Entrando en modo Debug....\n" );
+		printf("\nEntrando en modo Debug....\n" );
 		adquisicion(fd, accion, dvalue, buf);
 	}else{
 		c = 0;
 		while(!c) {
-			timestamp(1);
-			c = dbfunc(2, nombredb);
+			c = dbfunc(ADQUISICION_DATOS_PERIODICA, nombredb);
 			sleep(tvalue);
 		}
 	}
