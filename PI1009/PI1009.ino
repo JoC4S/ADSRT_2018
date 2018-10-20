@@ -28,6 +28,8 @@ String codiRetorn;
 int valorEx = 0;                           //valor recibido para analisis de sobrecalentamiento
 int PinLed = 13;
 
+analogReference INTERNAL;
+
 void setup() {
 
         Serial.begin(9600); // abre el puerto serie,y le asigna la velocidad de 9600 bps

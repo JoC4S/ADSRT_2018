@@ -38,6 +38,8 @@ char checkMsgE (String msgRecibido);
 char checkMsgC (String msgRecibido);
 char checkMsgM (String msgRecibido);
 
+analogReference (INTERNAL);
+
 void setup() {
 
         Serial.begin(9600); // abre el puerto serie,y le asigna la velocidad de 9600 bps
@@ -69,6 +71,8 @@ void setup() {
         TCCR1B |= (1 << CS12); // 256 prescaler
         TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
         interrupts(); // enable all interrupts
+
+        analogReference(INTERNAL);
 
         Serial.setTimeout(timeout);
 

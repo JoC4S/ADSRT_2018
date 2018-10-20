@@ -1,47 +1,70 @@
+/*
+ * (c) EUSS 2013
+ *
+ *
+ * Exemple d'utilització dels timers de la biblioteca librt
+ * Crea dos timers que es disparen cada segon de forma alternada
+ * Cada cop que es disparen imprimeixen per pantalla un missatge
+ *
+ * Per compilar: gcc exemple_timer.c -lrt -lpthread -o timer
+ */
+#include <pthread.h>
+#include <signal.h>
+#include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-    #include <stdio.h>
-    #include <time.h>
-    #include <signal.h>
-timer_t gTimerid1;
-struct sigevent sigv;
-siginfo_t SIGTEM1;
+typedef void (timer_callback) (union sigval);
 
-void start_timer1(void)
+/* Funció set_timer
+ *
+ * Crear un timer
+ *
+ * Paràmetres:
+ * timer_id: punter a una estructura de tipus timer_t
+ * delay: retard disparament timer (segons)
+ * interval: periode disparament timer  (segons)
+ * func: funció que s'executarà al disparar el timer
+ * data: informació que es passarà a la funció func
+ *
+ * */
+int set_timer(timer_t * timer_id, float delay, float interval, timer_callback * func, void * data)
 {
-	struct itimerspec value;
-	value.it_value.tv_sec = 5;//waits for 5 seconds before sending timer signal
-	value.it_value.tv_nsec = 0;
-	value.it_interval.tv_sec = 5;//sends timer signal every 5 seconds
-	value.it_interval.tv_nsec = 0;
+    int status =0;
+    struct itimerspec ts;
+    struct sigevent se;
 
-        sigv.sigev_notify = SIGEV_SIGNAL;
-        sigv.sigev_signo = SEG;
-	if (!timer_create (CLOCK_REALTIME, &sigv, &gTimerid1)) {
-		printf("Creado timer 'start_time1'\n" );
-	}else
-		printf("Error al setear 'timer_create'\n" );
-	timer_settime (gTimerid1, 0, &value, NULL);
-}
-void stop_timer(void)
-{
-	struct itimerspec value;
-	value.it_value.tv_sec = 5;
-	value.it_value.tv_nsec = 0;
-	value.it_interval.tv_sec = 0;
-	value.it_interval.tv_nsec = 0;
-	timer_settime (gTimerid1, 0, &value, NULL);
-}
-void timer_callback1(int sig) {
-	printf(" Catched timer signal 1: %d ... !!\n", sig);
+    se.sigev_notify = SIGEV_THREAD;
+    se.sigev_value.sival_ptr = data;
+    se.sigev_notify_function = func;
+    se.sigev_notify_attributes = NULL;
+
+    status = timer_create(CLOCK_REALTIME, &se, timer_id);
+
+    ts.it_value.tv_sec = abs(delay);
+    ts.it_value.tv_nsec = (delay-abs(delay)) * 1e09;
+    ts.it_interval.tv_sec = abs(interval);
+    ts.it_interval.tv_nsec = (interval-abs(interval)) * 1e09;
+
+    status = timer_settime(*timer_id, 0, &ts, 0);
+    return 0;
 }
 
-int main(int ac, char **av)
+void callback(union sigval si)
 {
-	char c = '\0';
-	signal(SIGTEM1.si_signo, timer_callback1);
-	//signal(SIGALRM, timer_callback2);
-	printf("Inicio Main:\n");
-	start_timer1();
-	//start_timer2();
-	while(1){}
+    char * msg = (char *) si.sival_ptr;
+
+    printf("%s\n",msg);
+}
+
+int main(int argc, char ** argv)
+{
+
+    timer_t tick;
+    timer_t tock;
+    set_timer(&tick, 1, 1, callback, (void *) "tick" );
+    set_timer(&tock, 1.5, 1, callback, (void *) "tock" );
+    getchar();
+
+return 0;
 }
