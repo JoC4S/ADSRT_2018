@@ -149,6 +149,7 @@ int controlTemp (float mustratemperatura, int fanstatus){
 		if (fanstatus)
 			fanOnOff(FAN_OFF);
 	}
+	return 0;
 }
 /*!
    \brief "Funcion para uso del sqlite"
@@ -323,7 +324,6 @@ void TancarSerie(int fd)
  */
 int SendcommSerie(int fd, char *missatgeSerie)
 {
-	int i = 0;
 	int res = 0;
 	// Bloqueamos acceso al puerto Serie al resto de threads y procesos.
 	//pthread_mutex_lock(&varmutex);
@@ -351,7 +351,6 @@ int recieveCommSerie(int fd, char buf[256])
 {
 	int i = 0, bytes = 0;
 	int receiveState = 0;
-	int c = 0;
 	/** conf SELECT*/
 	fd_set rfds;
 	struct timeval tv;
@@ -437,7 +436,8 @@ int fanOnOff (char *fan)
 	char orden[7] = "\0";
 	int OnOff;
 	/** Activa o desactiva el ventilador*/
-	if ((fan == "0") || (fan == "1")) {
+	//if (strncmp(fan,FAN_OFF,1) || strncmp(fan,FAN_ON,1)) {
+	if ((fan == "1") || (fan == "0")) {
 		strcpy(orden, "AS");
 		strcat(orden, PIN_VENTILADOR);
 		strcat(orden,fan);
@@ -449,10 +449,12 @@ int fanOnOff (char *fan)
 			fprintf(stderr,COLOR_RED "Error en recepción\n" COLOR_RESET );
 		/** Se borra el ultimo msg recibido y el buffer Serie de entrada*/
 		memset(buf, '\0', 256);
+
 		tcflush(fd,TCIOFLUSH);
 		OnOff = atoi(fan);
 	}
 	/** Solicita el estado del ventilador*/
+	//if (strncmp(fan,FAN_STATUS,1)) {
 	if (fan == "2") {
 		strcpy(orden, "AE");
 		strcat(orden, PIN_VENTILADOR);
@@ -599,11 +601,14 @@ int set_timer(timer_t * timer_id, float delay, float interval, timer_callback * 
 	status = timer_settime(*timer_id, 0, &ts, 0);
 	return 0;
 }
-
+/*!
+   \brief Timer utilizado para la adquisición periodica de la temperatura.
+   \param "Param description"
+   \pre "Set_timer debe de ejecutarse con exito.
+   \return "Void"
+ */
 void callback_timer_adquisicion(union sigval si)
 {
-	char * msg = (char *) si.sival_ptr;
-
 	dbfunc(ADQUISICION_DATOS_PERIODICA, nombredb);
 	printf("\nEsperando siguiente toma de datos. Salir? (q):\n ");
 }
