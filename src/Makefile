@@ -1,5 +1,5 @@
 all:
-	arm-linux-gnueabi-gcc main.c -Wall -lpthread -lrt -l sqlite3 -o captura
+	arm-linux-gnueabi-gcc main.c -Wall -lpthread -lrt -lsqlite3 -o captura
 
 clean:
 	rm captura
