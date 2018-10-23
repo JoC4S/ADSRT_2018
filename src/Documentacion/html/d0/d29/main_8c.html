@@ -82,6 +82,7 @@ $(document).ready(function(){initNavTree('d0/d29/main_8c.html','../../');});
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -131,14 +132,35 @@ Macros</h2></td></tr>
 <tr class="memitem:ad8ff202ed1966d6db435a234f7e53204"><td class="memItemLeft" align="right" valign="top"><a id="ad8ff202ed1966d6db435a234f7e53204"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>PIN_VENTILADOR</b>&#160;&#160;&#160;&quot;03&quot;                     /** Pin de Arduino que activa el ventilador*/</td></tr>
 <tr class="separator:ad8ff202ed1966d6db435a234f7e53204"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af81e429234dedf0f68fbc22501147012"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#af81e429234dedf0f68fbc22501147012">CONST_TEMP</a>&#160;&#160;&#160;0.048</td></tr>
+<tr class="memitem:af81e429234dedf0f68fbc22501147012"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#af81e429234dedf0f68fbc22501147012">CONST_TEMP</a>&#160;&#160;&#160;0.004883</td></tr>
 <tr class="separator:af81e429234dedf0f68fbc22501147012"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3038d405961f05975832d64d96f5e321"><td class="memItemLeft" align="right" valign="top"><a id="a3038d405961f05975832d64d96f5e321"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>TIMEOUT_TEMP</b>&#160;&#160;&#160;3                          /** Tiempo en segundos para provocar un error de timeout*/</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>TIMEOUT_TEMP</b>&#160;&#160;&#160;5                          /** Tiempo en segundos para provocar un error de timeout*/</td></tr>
 <tr class="separator:a3038d405961f05975832d64d96f5e321"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a450f54a9ac27bb43b59a9fae9f45942c"><td class="memItemLeft" align="right" valign="top"><a id="a450f54a9ac27bb43b59a9fae9f45942c"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>TIME_ADQ</b>&#160;&#160;&#160;5</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>TIME_ADQ</b>&#160;&#160;&#160;10</td></tr>
 <tr class="separator:a450f54a9ac27bb43b59a9fae9f45942c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b747274901d3a4593bf35286fb5388f"><td class="memItemLeft" align="right" valign="top"><a id="a0b747274901d3a4593bf35286fb5388f"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FAN_ON</b>&#160;&#160;&#160;&quot;1&quot;</td></tr>
+<tr class="separator:a0b747274901d3a4593bf35286fb5388f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac744a12c897b9ab3b663c642b87b6a78"><td class="memItemLeft" align="right" valign="top"><a id="ac744a12c897b9ab3b663c642b87b6a78"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FAN_OFF</b>&#160;&#160;&#160;&quot;0&quot;</td></tr>
+<tr class="separator:ac744a12c897b9ab3b663c642b87b6a78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a491faececde9f6ce63a2d84ba2b8f4f6"><td class="memItemLeft" align="right" valign="top"><a id="a491faececde9f6ce63a2d84ba2b8f4f6"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FAN_STATUS</b>&#160;&#160;&#160;&quot;2&quot;</td></tr>
+<tr class="separator:a491faececde9f6ce63a2d84ba2b8f4f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc9fda2436ef5ee043a11ea393e6a482"><td class="memItemLeft" align="right" valign="top"><a id="acc9fda2436ef5ee043a11ea393e6a482"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CREATE_DB</b>&#160;&#160;&#160;1                             /** Para función <a class="el" href="../../d0/d29/main_8c.html#a7b8f4ce3f53d8341fe7e0c56ad696cea">dbfunc</a>(). Indica la solicitud  de creacion de la base de datos-*/</td></tr>
+<tr class="separator:acc9fda2436ef5ee043a11ea393e6a482"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87d442f92c979c38143e1db691ba2e8c"><td class="memItemLeft" align="right" valign="top"><a id="a87d442f92c979c38143e1db691ba2e8c"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CONSIGNA_TEMP</b>&#160;&#160;&#160;27</td></tr>
+<tr class="separator:a87d442f92c979c38143e1db691ba2e8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3f5ae786ea023082d01a5d0d9503908"><td class="memItemLeft" align="right" valign="top"><a id="ac3f5ae786ea023082d01a5d0d9503908"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>PRINT_TIME</b>&#160;&#160;&#160;1                            /** Para funcion <a class="el" href="../../d0/d29/main_8c.html#a07d2962e36f7cd86b36de0d9e7bcd9ab">timestamp</a>(). Idica que se imprimira la hora por patnalla.*/</td></tr>
+<tr class="separator:ac3f5ae786ea023082d01a5d0d9503908"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d309aeceb4f31b8fc432ad5be786155"><td class="memItemLeft" align="right" valign="top"><a id="a1d309aeceb4f31b8fc432ad5be786155"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>ADQUISICION_DATOS_PERIODICA</b>&#160;&#160;&#160;2</td></tr>
+<tr class="separator:a1d309aeceb4f31b8fc432ad5be786155"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab39fec97d85960796efedec442f38004"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#ab39fec97d85960796efedec442f38004">INTERVAL</a>&#160;&#160;&#160;3000                           /* number of milliseconds to go off */</td></tr>
 <tr class="separator:ab39fec97d85960796efedec442f38004"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a734bbab06e1a9fd2e5522db0221ff6e3"><td class="memItemLeft" align="right" valign="top"><a id="a734bbab06e1a9fd2e5522db0221ff6e3"></a>
@@ -147,6 +169,12 @@ Macros</h2></td></tr>
 <tr class="memitem:aef28fa078fce7d7d79c1a28315cfda05"><td class="memItemLeft" align="right" valign="top"><a id="aef28fa078fce7d7d79c1a28315cfda05"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>MODEMDEVICE</b>&#160;&#160;&#160;&quot;/dev/ttyACM0&quot;</td></tr>
 <tr class="separator:aef28fa078fce7d7d79c1a28315cfda05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:af1576a61c368ac25d751d2496876b267"><td class="memItemLeft" align="right" valign="top"><a id="af1576a61c368ac25d751d2496876b267"></a>
+typedef void()&#160;</td><td class="memItemRight" valign="bottom"><b>timer_callback</b>(union sigval)</td></tr>
+<tr class="separator:af1576a61c368ac25d751d2496876b267"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -159,15 +187,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a07d2962e36f7cd86b36de0d9e7bcd9ab"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a07d2962e36f7cd86b36de0d9e7bcd9ab">timestamp</a> (int print)</td></tr>
 <tr class="memdesc:a07d2962e36f7cd86b36de0d9e7bcd9ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Obtencion de fecha con formato sqlite DATETIME"  <a href="#a07d2962e36f7cd86b36de0d9e7bcd9ab">More...</a><br /></td></tr>
 <tr class="separator:a07d2962e36f7cd86b36de0d9e7bcd9ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fbfee1df76a61ec8bc9f23d616c3e53"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a4fbfee1df76a61ec8bc9f23d616c3e53">controlTemp</a> (float mustratemperatura, int fanstatus)</td></tr>
+<tr class="memdesc:a4fbfee1df76a61ec8bc9f23d616c3e53"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Comprueba que la temperatura este siendo controlada."  <a href="#a4fbfee1df76a61ec8bc9f23d616c3e53">More...</a><br /></td></tr>
+<tr class="separator:a4fbfee1df76a61ec8bc9f23d616c3e53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b8f4ce3f53d8341fe7e0c56ad696cea"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a7b8f4ce3f53d8341fe7e0c56ad696cea">dbfunc</a> (int opcion, char *<a class="el" href="../../d0/d29/main_8c.html#a16aba9cd49b38df68a72d1f0d49cb766">nombredb</a>)</td></tr>
 <tr class="memdesc:a7b8f4ce3f53d8341fe7e0c56ad696cea"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Funcion para uso del sqlite"  <a href="#a7b8f4ce3f53d8341fe7e0c56ad696cea">More...</a><br /></td></tr>
 <tr class="separator:a7b8f4ce3f53d8341fe7e0c56ad696cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ac194106572f1d9defbdb34642fa9c6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a4ac194106572f1d9defbdb34642fa9c6">ConfigurarSerie</a> (int fd)</td></tr>
 <tr class="memdesc:a4ac194106572f1d9defbdb34642fa9c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Configura y abre el puerto serie"  <a href="#a4ac194106572f1d9defbdb34642fa9c6">More...</a><br /></td></tr>
 <tr class="separator:a4ac194106572f1d9defbdb34642fa9c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb8610d67d76b5b3f96f502f4e6c0b23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#acb8610d67d76b5b3f96f502f4e6c0b23">alarm_SerialCommtimeout</a> (int signum)</td></tr>
-<tr class="memdesc:acb8610d67d76b5b3f96f502f4e6c0b23"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Funcion de trigger del flag alarma de tiempo de comunicacion Serie excedido."  <a href="#acb8610d67d76b5b3f96f502f4e6c0b23">More...</a><br /></td></tr>
-<tr class="separator:acb8610d67d76b5b3f96f502f4e6c0b23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb64813dff778d83119432217f5b2f4a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#abb64813dff778d83119432217f5b2f4a">TancarSerie</a> (int fd)</td></tr>
 <tr class="memdesc:abb64813dff778d83119432217f5b2f4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Cierra el puerto Serie"  <a href="#abb64813dff778d83119432217f5b2f4a">More...</a><br /></td></tr>
 <tr class="separator:abb64813dff778d83119432217f5b2f4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,20 +211,23 @@ Functions</h2></td></tr>
 <tr class="memitem:aade1be772806bb96cbf72d884ba00eb1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#aade1be772806bb96cbf72d884ba00eb1">adquisicion</a> (int fd, char *accion, int debug, char <a class="el" href="../../d0/d29/main_8c.html#a866e3eea299e33d1f7cdc6e46e65835f">buf</a>[256])</td></tr>
 <tr class="memdesc:aade1be772806bb96cbf72d884ba00eb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Adquiere de forma periodica los datos del sensor de temperatura y los almacena en la base de datos."  <a href="#aade1be772806bb96cbf72d884ba00eb1">More...</a><br /></td></tr>
 <tr class="separator:aade1be772806bb96cbf72d884ba00eb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6745b86fbd6eeec00e183b7fffe894e8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a6745b86fbd6eeec00e183b7fffe894e8">alarm_handler</a> (int signum)</td></tr>
-<tr class="memdesc:a6745b86fbd6eeec00e183b7fffe894e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alarma Timeout comunicacion.  <a href="#a6745b86fbd6eeec00e183b7fffe894e8">More...</a><br /></td></tr>
-<tr class="separator:a6745b86fbd6eeec00e183b7fffe894e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59d3f6052dfa067b2a066351b35d2c66"><td class="memItemLeft" align="right" valign="top"><a id="a59d3f6052dfa067b2a066351b35d2c66"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>set_timer</b> (timer_t *timer_id, float delay, float interval, timer_callback *func, void *data)</td></tr>
+<tr class="separator:a59d3f6052dfa067b2a066351b35d2c66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d370f0d762ae1314b9613f31ae1ec3b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a9d370f0d762ae1314b9613f31ae1ec3b">callback_timer_adquisicion</a> (union sigval si)</td></tr>
+<tr class="memdesc:a9d370f0d762ae1314b9613f31ae1ec3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timer utilizado para la adquisición periodica de la temperatura.  <a href="#a9d370f0d762ae1314b9613f31ae1ec3b">More...</a><br /></td></tr>
+<tr class="separator:a9d370f0d762ae1314b9613f31ae1ec3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a0ddf1224851353fc92bfbff6f499fa97">main</a> (int argc, char *argv[])</td></tr>
 <tr class="memdesc:a0ddf1224851353fc92bfbff6f499fa97"><td class="mdescLeft">&#160;</td><td class="mdescRight">"Funcion Principal"  <a href="#a0ddf1224851353fc92bfbff6f499fa97">More...</a><br /></td></tr>
 <tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a403285e37450b4db1fd1a7b456ad7921"><td class="memItemLeft" align="right" valign="top"><a id="a403285e37450b4db1fd1a7b456ad7921"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>SerialCommTimeOUT</b></td></tr>
-<tr class="separator:a403285e37450b4db1fd1a7b456ad7921"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d142fe9d4c915dba2208ba262f80dbb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a6d142fe9d4c915dba2208ba262f80dbb">AlarmCommTimeOUT</a></td></tr>
-<tr class="separator:a6d142fe9d4c915dba2208ba262f80dbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb897ee0566d1d7b0761d30ddfc1cbe3"><td class="memItemLeft" align="right" valign="top"><a id="abb897ee0566d1d7b0761d30ddfc1cbe3"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>ultimaTemperatura</b></td></tr>
+<tr class="separator:abb897ee0566d1d7b0761d30ddfc1cbe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afee7dd919ef3daf809d3cf8470355bf1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#afee7dd919ef3daf809d3cf8470355bf1">alarmTemp</a></td></tr>
+<tr class="separator:afee7dd919ef3daf809d3cf8470355bf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16aba9cd49b38df68a72d1f0d49cb766"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d29/main_8c.html#a16aba9cd49b38df68a72d1f0d49cb766">nombredb</a> = NULL</td></tr>
 <tr class="separator:a16aba9cd49b38df68a72d1f0d49cb766"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc97f5054a1b45039965e4ee787abc03"><td class="memItemLeft" align="right" valign="top"><a id="abc97f5054a1b45039965e4ee787abc03"></a>
@@ -221,7 +252,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define CONST_TEMP&#160;&#160;&#160;0.048</td>
+          <td class="memname">#define CONST_TEMP&#160;&#160;&#160;0.004883</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -314,59 +345,31 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
 
 </div>
 </div>
-<a id="a6745b86fbd6eeec00e183b7fffe894e8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6745b86fbd6eeec00e183b7fffe894e8">&#9670;&nbsp;</a></span>alarm_handler()</h2>
+<a id="a9d370f0d762ae1314b9613f31ae1ec3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d370f0d762ae1314b9613f31ae1ec3b">&#9670;&nbsp;</a></span>callback_timer_adquisicion()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void alarm_handler </td>
+          <td class="memname">void callback_timer_adquisicion </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>signum</em></td><td>)</td>
+          <td class="paramtype">union sigval&#160;</td>
+          <td class="paramname"><em>si</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Alarma Timeout comunicacion. </p>
+<p>Timer utilizado para la adquisición periodica de la temperatura. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Param description</td><td></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>"Return of the function" </dd></dl>
-
-</div>
-</div>
-<a id="acb8610d67d76b5b3f96f502f4e6c0b23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb8610d67d76b5b3f96f502f4e6c0b23">&#9670;&nbsp;</a></span>alarm_SerialCommtimeout()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void alarm_SerialCommtimeout </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>signum</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>"Funcion de trigger del flag alarma de tiempo de comunicacion Serie excedido." </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Param description</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section pre"><dt>Precondition</dt><dd>"Pre-conditions" </dd></dl>
-<dl class="section post"><dt>Postcondition</dt><dd>"Post-conditions" </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>"Return of the function" </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>"Set_timer debe de ejecutarse con exito.
+\return "Void" </dd></dl>
 
 </div>
 </div>
@@ -394,6 +397,46 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>"Return of the function" </dd></dl>
+
+</div>
+</div>
+<a id="a4fbfee1df76a61ec8bc9f23d616c3e53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fbfee1df76a61ec8bc9f23d616c3e53">&#9670;&nbsp;</a></span>controlTemp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int controlTemp </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>mustratemperatura</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fanstatus</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>"Comprueba que la temperatura este siendo controlada." </p>
+<p>"Se le pasa el ultimo dato de temperatura. En caso de llevar 5 tomas de temperatura" "seguidas sobrepasando la consigna, se realiza una inserción de alarma en la tabal de alarmas sqlite" </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Param description</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section pre"><dt>Precondition</dt><dd>"Pre-conditions" </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>"Post-conditions" </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>"Return of the function" </dd></dl>
+<p>Comprobacion de alarma de TEMPERATURA </p>
 
 </div>
 </div>
@@ -440,6 +483,13 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
 <p>Utilizamos 'sqlite3_prepare' para insertar los datos a partir de variables.</p>
 <p>?1 : Hora del sistema a la que se registra la muestra</p>
 <p>?2: Muestra del dato de temperatura registrado</p>
+<p>Control de temperatura mediante ventilador.</p>
+<p>Comprobacion de alarma de TEMPERATURA.</p>
+<p>Prepara los datos comunes para las tablas DATOS y ALARMAS.</p>
+<p>En caso de llevar 5 veces seguidas con el ventilador encendido, se introducira el dato en ALARMA</p>
+<p>Finalizamos la creación del statement para el sqlite y finalizamos cargandolo en la base de datos.</p>
+<p>Prepara los datos para rellenar la tabla DATOS</p>
+<p>Finalizamos la creación del statement para el sqlite y finalizamos cargandolo en la base de datos.</p>
 <p>Consultar datos de la tabla </p>
 
 </div>
@@ -468,8 +518,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>"PIN_VENTILADOR comprendido entre 0 y 13." </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>"int OnOff: 1= Ventilador encendido, 2=Ventilador apagado." </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>"PIN_VENTILADOR comprendido entre 0 y 12." </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>"int OnOff: 1= Ventilador encendido, 0=Ventilador apagado." </dd></dl>
 <p>Activa o desactiva el ventilador</p>
 <p>Se borra el ultimo msg recibido y el buffer Serie de entrada</p>
 <p>Solicita el estado del ventilador</p>
@@ -519,9 +569,16 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
 <p>Abrir la base de datos con el nombre suministrado y crear las tablas</p>
 <p>Enviamos el parametro para que se inicie la adquisicion de datos.</p>
 <p>Operació 'M' : Marxa / Parada conversió COMANDA: 'A''M' v Temps Temps Núm 'Z' v: (0=parada / 1=marxa) Temps: temps en segons de mostreig (1..20) Núm: Número de mostres fer la mitjana (1..9)</p>
+<p>Se solicita el arranque del proceso de arduino hasta que sea OK</p>
 <p>Esperamos la respuesta del Arduino al mensaje de inicio de adquisicion.</p>
 <p>En caso de no haber error, iniciamos la adquisicion de datos</p>
-<p>si la opcion de debug está activada, sacara el menu por pantalla </p>
+<p>si la opcion de debug está activada, sacara el menu por pantalla</p>
+<p>seteamos el timer para la adquisicion periodica</p>
+<p>Se llama a la funcion Callback_timer:adquisicion, que será quien ejecute la adquisicion de datos</p>
+<p>Se solicita el apagado del ventilador previo a salir de la aplicacion.</p>
+<p>Apagamos ciclo de recoleccion de datos en Arduino.</p>
+<p>Esperamos la respuesta del Arduino al mensaje de inicio de adquisicion.</p>
+<p>Cerramos puerto Serie. </p>
 
 </div>
 </div>
@@ -586,9 +643,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>"Return of the function" </dd></dl>
-<p>set up alarm handler</p>
-<p>Tiempo en microsegundos</p>
-<p>Configuracion de la Alarma</p>
+<p>conf SELECT</p>
+<p>Data is available now</p>
 <p>Si tenemos ocurre un timeout, sa sale de la función, dando error </p>
 
 </div>
@@ -674,15 +730,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
 </div><div class="memdoc">
 
 <p>"Obtiene el dato de temperatura del sensor." </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Param description</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
 <dl class="section pre"><dt>Precondition</dt><dd>"Pre-conditions" </dd></dl>
 <dl class="section post"><dt>Postcondition</dt><dd>"Post-conditions" </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>"float muestratemperatura" </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>"float muestratemperatura : Dato de temperatura en ºC." </dd></dl>
 <p>Se convierte el dato del buffer, se pasa a integer y se multiplica por la constante del sensor para obtener la temperatura</p>
 <p>Se borra el ultimo msg recibido y el buffer Serie de entrada</p>
 <p>Se prepara el dato de temperatura para mostrarlo por pantalla y devolverlo </p>
@@ -717,18 +767,18 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="a6d142fe9d4c915dba2208ba262f80dbb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6d142fe9d4c915dba2208ba262f80dbb">&#9670;&nbsp;</a></span>AlarmCommTimeOUT</h2>
+<a id="afee7dd919ef3daf809d3cf8470355bf1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afee7dd919ef3daf809d3cf8470355bf1">&#9670;&nbsp;</a></span>alarmTemp</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int AlarmCommTimeOUT</td>
+          <td class="memname">int alarmTemp</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Flag de timeout </p>
+<p>valor de la ultima muestra de temperatura adquirida </p>
 
 </div>
 </div>
@@ -758,7 +808,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>fd</b> = 0</td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Flag de Alarma de tiemout activada </p>
+<p>Numero de veces en que no se ha conseguido controlar la temperatura </p>
 
 </div>
 </div>
