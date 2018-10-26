@@ -38,8 +38,6 @@ char checkMsgE (String msgRecibido);
 char checkMsgC (String msgRecibido);
 char checkMsgM (String msgRecibido);
 
-analogReference (INTERNAL);
-
 void setup() {
 
         Serial.begin(9600); // abre el puerto serie,y le asigna la velocidad de 9600 bps
