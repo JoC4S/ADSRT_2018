@@ -1,0 +1,4 @@
+/home/josecs/Escritorio/ADSRT_2018/src/mail.c:8:10: fatal error: mail_lib.h: No existe el archivo o el directorio
+ #include "mail_lib.h"
+          ^~~~~~~~~~~~
+compilation terminated.

@@ -1,0 +1,14 @@
+all:
+	arm-linux-gnueabi-gcc main.c -Wall -lpthread -lrt -lsqlite3 -o captura
+
+clean:
+	rm captura
+
+install:
+	mkdir pi@172.28.10.202/home/alumne/Escriptori/Fita1
+	scp captura pi@172.28.10.202/home/alumne/Escriptori/Fita1
+
+libs:
+	gcc -Wall -fPIC -c -o -I.
+/include mail_lib.o mail_lib.c
+	gcc -shared -fPIC -o -I./include mail_lib.so mail_lib.o
