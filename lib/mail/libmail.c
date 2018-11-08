@@ -25,9 +25,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include "mail_lib.h"
-
-
+#include "libmail.h"
 
 struct sockaddr_in serverAddr;
 char serverName[] = "127.0.0.1";                                                //Adreça IP on està el client
@@ -43,21 +41,23 @@ char buffer[256];
    \pre "Definir parametros de correo"
    \return "void"
  */
-void sendTCPData (char *msg){
+ void sendTCPData (int opcion, char *msg){
 
-	int result = 0;
-	/*Enviar*/
-	result = write(sFd, msg, strlen(msg));
-	printf("SENT (bytes %d): %s\n", result, msg);
-	/*Rebre*/
-	memset(buffer,'\0',256);
-	result = read(sFd, buffer, 256);
-	printf("RECV(bytes %d): %s\n", result, buffer);
-	if (result <0) {
-		printf ("\n¡Error en recepción!.\n");
-		exit(-1);
-	}
-}
+ 	int result = 0;
+ 	/*Enviar*/
+ 	result = write(sFd, msg, strlen(msg));
+ 	printf("SENT (bytes %d): %s\n", result, msg);
+ 	/*Rebre si opción = 0*/
+ 	if (!opcion){
+ 		memset(buffer,'\0',256);
+ 		result = read(sFd, buffer, 256);
+ 		printf("RECV(bytes %d): %s\n", result, buffer);
+ 		if (result <0) {
+ 			printf ("\n¡Error en recepción!.\n");
+ 			exit(-1);
+ 		}
+ 	}
+ }
 /************************
 * tcpClient
 ************************/
@@ -88,34 +88,34 @@ int sendmail(char *texto_a_enviar){
 
 /** Envio de correo:*/
 
-	sendTCPData(ehlo);
+	sendTCPData(WAITFOR_ACK,ehlo);
 
 	/*Enviar Solicitud de autorizacion de usuario*/
-	sendTCPData(authlogin);
+	sendTCPData(WAITFOR_ACK,authlogin);
 
 	/*Enviar usuario encriptado*/
-	sendTCPData(mailuser64);
+	sendTCPData(WAITFOR_ACK,mailuser64);
 
 	/*Enviar pass usuario encriptado*/
-	sendTCPData(userpass64);
+	sendTCPData(WAITFOR_ACK,userpass64);
 
 	/*Enviar remitente*/
-	sendTCPData(mailfrom);
+	sendTCPData(WAITFOR_ACK,mailfrom);
 
 	/*Enviar Destinatario*/
-	sendTCPData(mailto);
+	sendTCPData(WAITFOR_ACK,mailto);
 
 	/*Enviar comando inicio envio de cuerpo del mail*/
-	sendTCPData(DATA);
+	sendTCPData(WAITFOR_ACK,DATA);
 
 	/*Enviar Asunto del correo*/
-	sendTCPData(mailSubject);
+	char mailContent [strlen(mailSubject) + strlen(mailtext)];
+	strcpy(mailContent,mailSubject);
+	strcat(mailContent,mailtext);
+	sendTCPData(NOACKWAIT,mailContent);
 
-	/*Enviar Cuerpo del mensaje*/
-	sendTCPData(texto_a_enviar);
-
-	/** Finalizar envio de correo*/
-	sendTCPData(endOfmail);
+	/*Enviar Fin del mensaje*/
+	sendTCPData(WAITFOR_ACK, endOfmail);
 
 	close(sFd);
 

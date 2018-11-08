@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
 	char missatge1[] = "MAIL FROM: test@mail.com\n";
 	char missatge2[] = "RCPT TO: 1104934@campus.euss.org\n";
 	char missatge3[] = "DATA\n";
-	char missatge4[] = "Subject: mail d'exemple\nFrom: \1457636@campus.euss.org\n \
+	char missatge4[] = "Subject: mail d'exemple\nFrom: 1457636@campus.euss.org\n \
 				To: 1422047@campus.euss.org\nHola Salva\n\n Això es un mail de prova\n\n";
 	char missatge[1024];
 
