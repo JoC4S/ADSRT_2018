@@ -10,8 +10,9 @@
 
 int main(int argc, char const *argv[]) {
 
+        char mailto[] = "RCPT TO: <jose.cayero@me.com>\n";
+        char Contenido[1000] = "Texto del mail.\nFin.\n";
 
-
-        sendmail("Este es el texto del mail de prueba desde la aplicación.\n Jose.");
+        sendmail(mailto, Contenido);
         return 0;
 }

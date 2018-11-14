@@ -61,7 +61,7 @@ char buffer[256];
 /************************
 * tcpClient
 ************************/
-int sendmail(char *texto_a_enviar){
+int sendmail(char *mailto, char *texto_a_enviar){
 
 	/*Crear el socket*/
 	sFd=socket(AF_INET,SOCK_STREAM,0);
@@ -109,9 +109,9 @@ int sendmail(char *texto_a_enviar){
 	sendTCPData(WAITFOR_ACK,DATA);
 
 	/*Enviar Asunto del correo*/
-	char mailContent [strlen(mailSubject) + strlen(mailtext)];
+	char mailContent [strlen(mailSubject) + strlen(texto_a_enviar)];
 	strcpy(mailContent,mailSubject);
-	strcat(mailContent,mailtext);
+	strcat(mailContent,texto_a_enviar);
 	sendTCPData(NOACKWAIT,mailContent);
 
 	/*Enviar Fin del mensaje*/
