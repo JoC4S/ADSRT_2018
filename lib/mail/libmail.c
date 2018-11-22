@@ -1,9 +1,9 @@
 /***************************************************************************
-                          main.c  -  client
+                          libmail.c  -  client
                              -------------------
-    begin                : mie Nov  47 16:00:04 CET 2018
+    begin                : mie Nov  7 16:00:04 CET 2018
     copyright            : (C) 2002 by J. Cayero
-    email                : jmcsaez@gmail.com
+    email                :
 ***************************************************************************/
 
 /***************************************************************************
@@ -33,31 +33,32 @@ int sockAddrSize;
 int sFd;
 int result;
 char buffer[256];
-                              /** Comando de finalización de correo.*/
+/** Comando de finalización de correo.*/
 
 /*!
    \brief Funcion para envio y recepción de una cadena de texto a traveś de socket
    \param "char* msg: Mensaje que se desea enviar a traves del socket."
+   \param "int opcion": "1" Se espera respuesta, "0" No se espera respuesta
    \pre "Definir parametros de correo"
    \return "void"
  */
- void sendTCPData (int opcion, char *msg){
+void sendTCPData (int opcion, char *msg){
 
- 	int result = 0;
- 	/*Enviar*/
- 	result = write(sFd, msg, strlen(msg));
- 	printf("SENT (bytes %d): %s\n", result, msg);
- 	/*Rebre si opción = 0*/
- 	if (!opcion){
- 		memset(buffer,'\0',256);
- 		result = read(sFd, buffer, 256);
- 		printf("RECV(bytes %d): %s\n", result, buffer);
- 		if (result <0) {
- 			printf ("\n¡Error en recepción!.\n");
- 			exit(-1);
- 		}
- 	}
- }
+	int result = 0;
+	/*Enviar*/
+	result = write(sFd, msg, strlen(msg));
+	printf("SENT (bytes %d): %s\n", result, msg);
+	/*Rebre si opción = 0*/
+	if (!opcion) {
+		memset(buffer,'\0',256);
+		result = read(sFd, buffer, 256);
+		printf("RECV(bytes %d): %s\n", result, buffer);
+		if (result <0) {
+			printf ("\n¡Error en recepción!.\n");
+			exit(-1);
+		}
+	}
+}
 /************************
 * tcpClient
 ************************/

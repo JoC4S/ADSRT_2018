@@ -34,6 +34,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <termios.h>
+#include "libmail.h"
 
 #define COLOR_GREEN "\x1B[32m"
 #define COLOR_RED "\x1B[31m"
@@ -227,6 +228,9 @@ int dbfunc(int opcion, char *nombredb)
 				printf("----> Tiempo vent. encendido: %d min'\n",alarmTemp);
 			}
 			sqlite3_finalize(stmt);
+			char mailto[] = "RCPT TO: <1104934@campus.euss.org>\n";
+		        char Contenido[1000] = "Alarma de temperatura.\nFin.\n";
+			sendmail(mailto, Contenido);
 		}
 		/** Prepara los datos para rellenar la tabla DATOS*/
 		sqlite3_prepare_v2(db, "insert into DATOS (HORA, TEMPERATURA, VENTILADOR) values (?1, ?2, ?3);", -1, &stmt, NULL);
@@ -385,7 +389,7 @@ int recieveCommSerie(int fd, char buf[256])
 				/** Si tenemos ocurre un timeout, sa sale de la función, dando error*/
 				if (buf[0] == 'A' && (buf[3] == 'Z' || buf[4] == 'Z' || buf[6] == 'Z' || buf[7] == 'Z')) {
 					printf(COLOR_YELLOW "%s ", buf);
-					printf(COLOR_GREEN "<-- :Recibido Serie %ld bytes.\n" COLOR_RESET, strlen(buf));
+					printf(COLOR_GREEN "<-- :Recibido Serie %d bytes.\n" COLOR_RESET, strlen(buf));
 					receiveState = 0;
 					break;
 				}
