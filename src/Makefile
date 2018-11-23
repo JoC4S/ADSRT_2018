@@ -1,11 +1,10 @@
 all: mail libs
 
 captura:
-	gcc -Wall -c -o captura.o captura.c
-	gcc -Wall -o captura captura.o -lrt -lsqlite3
+	gcc -Wall -c -o captura.o captura.c -I../include
+	gcc -Wall -o captura captura.o -I../include -L../lib/mail -lrt -lsqlite3 -lmail
 	cp captura ../bin
-	rm captura
-	rm captura.o
+	rm captura captura.o
 
 captura_arm:
 	@echo ===========================================
@@ -15,7 +14,7 @@ captura_arm:
 	arm-linux-gnueabi-gcc -Wall -shared -fPIC -o libmail.so libmail.o -I../inlcude
 	scp libmail.so pi@192.168.2.135:/tmp
 	arm-linux-gnueabi-gcc -c -o captura_arm.o captura.c -Wall -I../include
-	arm-linux-gnueabi-gcc -o captura_arm captura_arm.o -Wall -I../include -L./ -lrt -lmail -lsqlite3
+	arm-linux-gnueabi-gcc -o captura_arm captura_arm.o -Wall -I../include -L./  -lrt -lmail -L../lib/sqlite3arm/ -lsqlite3
 	scp mail_arm pi@192.168.2.135:/tmp	
 	rm captura_arm.o captura_arm libmail.o libmail.so
 
