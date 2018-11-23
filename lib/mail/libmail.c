@@ -28,7 +28,7 @@
 #include "libmail.h"
 
 struct sockaddr_in serverAddr;
-char serverName[] = "127.0.0.1";                                                //Adreça IP on està el client
+char serverName[] = "172.20.0.21";                                                //Adreça IP on està el client
 int sockAddrSize;
 int sFd;
 int result;
