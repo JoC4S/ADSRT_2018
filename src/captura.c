@@ -1,5 +1,5 @@
 /*!
-   \file "main.c"
+   \file "captura.c"
    \brief "Programa ADST_2018_1104934"
    \author "1104934"
    \date "23"/"10"/"2018"

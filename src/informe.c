@@ -215,9 +215,7 @@ int callback_avgtemp(void *NotUsed, int argc, char **argv, char **azColName) {
 }
 /*!
    \brief Realiza query a la base de datos.
-   \param horaInicio, horaFinal, tampFanOn, maxTemp, minTemp, avgTemp
-   \pre "Pre-conditions"
-   \post "Post-conditions"
+   \param Opcione: horaInicio, horaFinal, tampFanOn, maxTemp, minTemp, avgTemp
    \return "Return of the function"
  */
 int query(int opcion){

@@ -15,7 +15,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"d0/d29/main_8c.html"
+"d6/db1/libmail_8c.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
