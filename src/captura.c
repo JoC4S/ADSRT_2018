@@ -54,7 +54,7 @@
 
 float ultimaTemperatura;                        /** valor de la ultima muestra de temperatura adquirida*/
 int alarmTemp;                                  /** Numero de veces en que no se ha conseguido controlar la temperatura*/
-char *nombredb = NULL;                          /** Valor del parameto o*/
+char *nombredb = NULL;                          /** Valor del parameto n*/
 
 #define INTERVAL 3000                           /* number of milliseconds to go off */
 

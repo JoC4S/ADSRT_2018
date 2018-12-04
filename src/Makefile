@@ -1,53 +1,78 @@
-all: mail libs
+all:
 
 captura:
-	gcc -Wall -c -o captura.o captura.c -I../include
-	gcc -Wall -o captura captura.o -I../include -L../lib/mail -lrt -lsqlite3 -lmail
+	@echo =======================================================
+	@echo Se compila libreria libmail.so para x86
+	@echo =======================================================
+
+	+$(MAKE) libmail -C ../lib/
+
+	@echo =======================================================
+	@echo Se compila programa captura para x86
+	@echo =======================================================
+	gcc  -c -o captura.o captura.c -I../include
+	gcc  -o captura captura.o -lsqlite3 -lrt -I../include -L../lib/ -lmail
 	cp captura ../bin
-	rm captura captura.o
+	rm captura.o captura
+
+informe:
+	gcc -c -o informe.o informe.c -I../include
+	gcc -o informe informe.o -lsqlite3 -lrt -I../include -L../lib/   -lmail
+	cp informe ../bin
+	rm informe.o informe
+
+informe_arm:
+	@echo =======================================================
+	@echo Se compila informe para ARM
+	@echo =======================================================
+	arm-linux-gnueabi-gcc -c -o informe.o informe.c -I../include
+	arm-linux-gnueabi-gcc -o informe informe.o -lrt -I../include -L../lib/arm -lmail -lsqlite3
+	cp informe ../bin/arm
+	scp ../bin/arm/informe pi@192.168.2.199:/tmp
+	rm informe.o informe
 
 captura_arm:
-	@echo ===========================================
-	@echo Se crean el ejecutable y librerias para ARM 
-	@echo ============================================
-	arm-linux-gnueabi-gcc -Wall -fPIC -c -o libmail.o ../lib/mail/libmail.c -I../include
-	arm-linux-gnueabi-gcc -Wall -shared -fPIC -o libmail.so libmail.o -I../inlcude
-	scp libmail.so pi@192.168.2.135:/tmp
-	arm-linux-gnueabi-gcc -c -o captura_arm.o captura.c -Wall -I../include
-	arm-linux-gnueabi-gcc -o captura_arm captura_arm.o -Wall -I../include -L./  -lrt -lmail -L../lib/sqlite3arm/ -lsqlite3
-	scp mail_arm pi@192.168.2.135:/tmp	
-	rm captura_arm.o captura_arm libmail.o libmail.so
+	@echo =======================================================
+	@echo Se crean el ejecutable y librerias para ARM
+	@echo =======================================================
+	+$(MAKE) libmailarm -B ../lib/
+	arm-linux-gnueabi-gcc -c -o captura_arm.o captura.c -I../include
+	arm-linux-gnueabi-gcc -o captura_arm captura_arm.o -I../include -L./  -lrt -lmail -L../lib/arm/ -lsqlite3
+	#scp mail_arm pi@172.28.10.202:/tmp
+	@echo =======================================================
+	@echo Se copian ejecutable y librerias en Raspberry
+	@echo =======================================================
+	scp ../lib/arm/libmail.so captura_arm ../lib/arm/libsqlite3.so ../script/scaptura_arm.sh pi@192.168.2.199:/tmp
+	rm captura_arm.o captura_arm
 
 install:
-	mkdir pi@172.28.10.202/home/alumne/Escriptori/Fita1
-	scp captura_arm pi@172.28.10.202/home/alumne/Escriptori/Fita1
+	@echo =======================================================
+	@echo Se crea libreria libmail.so para ARM sin crossCompiling
+	@echo =======================================================
 
-mail:
-	#echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/josecs/Escritorio/ADSRT_2018/lib/mail/
+	scp ../lib/libmail.c ../include/libmail.h  pi@192.168.2.199:/tmp
+	ssh pi@192.168.2.199 gcc -fPIC -c -o /tmp/libmail.o /tmp/libmail.c
+	ssh pi@192.168.2.199 gcc -shared -fPIC -o /tmp/libmail.so /tmp/libmail.o
+	ssh pi@192.168.2.199 rm /tmp/libmail.c /tmp/libmail.o /tmp/libmail.h
 
-	gcc -Wall -c -o mail.o mail.c -I../include
-	gcc -Wall -o mail mail.o -I../include -L../lib/mail -lmail
-	cp mail ../bin
-	rm mail.o
-	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/josecs/Escritorio/ADSRT_2018/lib/mail/ ./mail
-
-mail_arm:
 	@echo ===========================================
-	@echo Se crean el ejecutable y librerias para ARM 
+	@echo Se compila programa para ARM
 	@echo ============================================
-	arm-linux-gnueabi-gcc -Wall -fPIC -c -o libmail.o ../lib/mail/libmail.c -I../include
-	arm-linux-gnueabi-gcc -Wall -shared -fPIC -o libmail.so libmail.o -I../inlcude
-	scp libmail.so pi@192.168.2.135:/tmp
-	arm-linux-gnueabi-gcc -c -o mail_arm.o mail.c -Wall -I../include
-	arm-linux-gnueabi-gcc -o mail_arm mail_arm.o -Wall -I../include -L./ -lpthread -lrt -lmail
-	scp mail_arm pi@192.168.2.135:/tmp	
-	rm mail_arm.o mail_arm libmail.o libmail.so
 
-libs:
-	+$(MAKE) -C ../lib/mail
+	arm-linux-gnueabi-gcc -c -o captura_arm.o captura.c -I../include
+	arm-linux-gnueabi-gcc -o captura_arm captura_arm.o -I../include -L./  -lrt -lmail -L../lib/arm/ -lsqlite3
 
-Raspberry:
-		arm-linux-gnueabi-gcc -c -o captura_arm.o captura.c -Wall -I../include
-		arm-linux-gnueabi-gcc -o captura_arm captura_arm.o -Wall -I../include -L../lib/mail -lpthread -lrt -lsqlite3 -lmail
-		cp captura_arm ../bin
-		rm cptura_arm.o
+	+$(MAKE) -B informe_arm
+
+	@echo =================================================================
+	@echo Se copian ejecutable 'captura', librerias y scropts en Raspberry
+	@echo =================================================================
+
+	scp captura_arm ../bin/captura.db ../lib/arm/libsqlite3.so ../script/scaptura_arm.sh ../script/sinforme.sh pi@192.168.2.199:/tmp
+	rm captura_arm.o captura_arm
+
+libmail:
+	+$(MAKE) -C ../lib/
+
+libmailarm:
+	+$(MAKE) libmailarm -C ../lib/

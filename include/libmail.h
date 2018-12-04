@@ -16,8 +16,7 @@
 //#define mailto        "RCPT TO:: <user@euss.es>\n"                           /** Remitente*/
 #define mailfrom       "mail from: <user@euss.es>\n"                           /** Remitente*/
 #define DATA            "DATA\n"                                                /** Comando de inicio de cuerpo del correo*/
-#define mailSubject	    "Subject: Ejemplo de comunicación a traves de mail.\nFrom: user@euss.es\nTo: <user@euss.es>\n" /** Asunto del correo*/
-#define mailtext	      "\nEsto es el cuerpo del correo\n\nFin del correo\nAdios.\n"
+#define mailSubject	    "Subject: Informe diario.\nFrom: user@euss.es\nTo: <user@euss.es>\n" /** Asunto del correo*/
 #define endOfmail       "\r\n.\r\n"                                             /** Comando de finalización de correo.*/
 
 

@@ -28,12 +28,13 @@
 #include "libmail.h"
 
 struct sockaddr_in serverAddr;
-char serverName[] = "172.20.0.21";                                                //Adreça IP on està el client
+//char serverName[] = "172.20.0.21";                                            //Adreça IP on està el client EUSS
+char serverName[] = "127.0.0.1";                                                //Adreça IP on està el client HOME
+
 int sockAddrSize;
 int sFd;
 int result;
 char buffer[256];
-/** Comando de finalización de correo.*/
 
 /*!
    \brief Funcion para envio y recepción de una cadena de texto a traveś de socket
@@ -88,6 +89,12 @@ int sendmail(char *mailto, char *texto_a_enviar){
 	printf("RECV(bytes %d): %s\n",   result, buffer);
 
 /** Envio de correo:*/
+	/** Dar formato a dirección de correo.*/
+	char maildestino[50];
+	strcpy(maildestino,"RCPT TO: <" );
+	strcat(maildestino, mailto);
+	strcat (maildestino, ">\n");
+	printf("Destinatario: %s", maildestino);
 
 	sendTCPData(WAITFOR_ACK,ehlo);
 
@@ -104,7 +111,7 @@ int sendmail(char *mailto, char *texto_a_enviar){
 	sendTCPData(WAITFOR_ACK,mailfrom);
 
 	/*Enviar Destinatario*/
-	sendTCPData(WAITFOR_ACK,mailto);
+	sendTCPData(WAITFOR_ACK,maildestino);
 
 	/*Enviar comando inicio envio de cuerpo del mail*/
 	sendTCPData(WAITFOR_ACK,DATA);
