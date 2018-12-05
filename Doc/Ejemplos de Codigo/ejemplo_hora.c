@@ -31,13 +31,17 @@
 
 int main(void)
 {
-        time_t rawtime;
+        time_t rawtime, seconds;
         struct tm *info;
+        struct tm *diaprevio;
         char buffer[80];
+        char diapreviobuff[80];
 
         time( &rawtime );
 
         info = localtime( &rawtime );
+
+        //printf("diferencia en segundos = %ld\n",dif);
         //El valor de retorn es a una variable de tipus timei_t, on posaràl temps en segons des de 1970-01-01 00:00:00 +0000 (UTC)
 
         // struct tm {
@@ -54,6 +58,12 @@ int main(void)
 
         strftime(buffer,80,"%Y-%m-%d %H:%M:%S", info);
         printf("Formatted date & time : %s\n", buffer );
+
+        seconds = rawtime -86400;
+        diaprevio = localtime (&seconds);
+
+        strftime(diapreviobuff,80,"%Y-%m-%d %H:%M:%S", diaprevio);
+        printf("Formatted date & time dia anterior : %s\n", diapreviobuff );
 
         return 0;
 }

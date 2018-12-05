@@ -46,6 +46,10 @@
 #define horaFinalAlarm  8                       /** Opción para funcion Query. Solicita hora final de las alarmas.*/
 #define tempFanOnAlarm 9                        /** Opción para funcion Query. Solicita tiempo que ha estado funcionando el ventilador con estado de alarma.*/
 
+#define d_ayer 2
+#define d_antesdeayer 3
+#define d_hoy 4
+
 
 
 #define COLOR_GREEN "\x1B[32m"
@@ -56,19 +60,19 @@
 char informe[500];
 char mail_informe[2000];
 
-int tvalue = 10;				/** Valor del tiempo de muestreo de temperatura. Ha de ser igual.*/
-sqlite3 *db;					/** variable sqlite3 para la base de datos.*/
+int tvalue = 10;                                /** Valor del tiempo de muestreo de temperatura. Ha de ser igual.*/
+sqlite3 *db;                                    /** variable sqlite3 para la base de datos.*/
 char *nombredb = NULL;                          /** Valor del parameto n*/
 
 /*!
    \brief "Obtencion de fecha con formato sqlite DATETIME"
-   \param "No tiene parametros"
+   \param "print: devuelve dia y hora actual, ayer: devuelve la fecha - 24h", antesdeayer - 48h
    \return "Devuelve puntero a un string con la fecha"
  */
 char* timestamp(int print)
 {
-	time_t rawtime;
-	struct tm *info;
+	time_t rawtime, diaprevio;
+	struct tm *info, *dia_anterior, *hoy;
 	char buffer[80];
 	char *retp;
 	time( &rawtime );
@@ -87,9 +91,36 @@ char* timestamp(int print)
 	//     int tm_yday;        /* day in the year */
 	//     int tm_isdst;       /* daylight saving time */
 	//};
-	strftime(buffer,80,"%Y-%m-%d %H:%M:%S", info);
-	if (print)
+
+	switch (print) {
+	case d_ayer: {                                          	/** Resta 24h a la fecha actual*/
+		diaprevio = rawtime -86400;
+		dia_anterior = localtime(&diaprevio);
+		strftime(buffer,80,"%Y-%m-%d", info);
+		break;
+	}
+	case d_antesdeayer: {                                           /** Resta 48h a la fecha actual*/
+		diaprevio = rawtime - (86400*2);
+		dia_anterior = localtime(&diaprevio);
+		strftime(buffer,80,"%Y-%m-%d", info);
+		break;
+	}
+	case d_hoy: {							/** Obtiene la fecha actual*/				
+		hoy = localtime(&rawtime);
+		strftime(buffer,80,"%Y-%m-%d", info);
+		break;
+	}
+	case 1: {
+		strftime(buffer,80,"%Y-%m-%d %H:%M:%S", info);
 		printf(COLOR_YELLOW "%s" COLOR_RESET, buffer );
+		break;
+	}
+	default: {
+		strftime(buffer,80,"%Y-%m-%d %H:%M:%S", info);
+		break;
+	}
+	}
+
 	retp = buffer;
 	return retp;
 }
@@ -98,7 +129,7 @@ char* timestamp(int print)
    \param "char nombredb[]"
    \pre   "La base de datos debe existir"
    \return "FAlse = OK, True = ERROR"
-*/
+ */
 int abrirdb(){
 
 	/** Abrimos la base de datos.*/
@@ -221,51 +252,86 @@ int callback_avgtemp(void *NotUsed, int argc, char **argv, char **azColName) {
 int query(int opcion){
 
 	int rc;
+	char ayer[50];                                                          /** Almacena la fecha y hora de 24 h atras*/
+	char antesdeayer[50];
+	char hoy[50];
 	char *err_msg = 0;
 
+	strcpy (ayer, timestamp(d_ayer));                                       /** asigna adaybefore la misma hora actual del sistema pero 24 horas antes*/
+	strcpy (antesdeayer, timestamp(d_antesdeayer));                         /** asigna adaybefore la misma hora actual del sistema pero 48 horas antes*/
+	strcpy (hoy, timestamp(d_hoy));
 	switch (opcion) {
 	case horaInicio: {
-		char *sql = "SELECT MIN(HORA) FROM DATOS;";
+		char sql[100] = "SELECT MIN(HORA) FROM DATOS WHERE HORA > '";
+		strcat(sql,antesdeayer);
+		strcat(sql, "';");
 		rc = sqlite3_exec(db, sql, callback_horaInicio, 0, &err_msg);
 		break;
 	}
 	case horaFinal: {
-		char *sql = "SELECT MAX(HORA) FROM DATOS;";
+		char sql[100] = "SELECT MAX(HORA) FROM DATOS WHERE HORA < '";
+		strcat(sql,hoy);
+		strcat(sql, "';");
 		rc = sqlite3_exec(db, sql, callback_horaFinal, 0, &err_msg);
 		break;
 	}
 	case tempFanOn: {
-		char *sql = "SELECT SUM(VENTILADOR) FROM DATOS;";
+		char sql[100] = "SELECT SUM(VENTILADOR) FROM DATOS WHERE HORA > '";
+		strcat(sql,ayer);
+		strcat(sql,"' AND HORA < '");
+		strcat(sql,hoy);
+		strcat(sql, "';");
 		rc = sqlite3_exec(db, sql, callback_fanOn, 0, &err_msg);
 		break;
 	}
 	case maxTemp: {
-		char *sql = "SELECT MAX(TEMPERATURA) FROM DATOS;";
+		char sql[100] = "SELECT MAX(TEMPERATURA) FROM DATOS WHERE HORA > '";
+		strcat(sql,ayer);
+		strcat(sql,"' AND HORA < '");
+		strcat(sql,hoy);
+		strcat(sql, "';");
 		rc = sqlite3_exec(db, sql, callback_maxtemp, 0, &err_msg);
 		break;
 	}
 	case minTemp: {
-		char *sql = "SELECT MIN(TEMPERATURA) FROM DATOS;";
+		char sql[100] = "SELECT MIN(TEMPERATURA) FROM DATOS WHERE HORA > '";
+		strcat(sql,ayer);
+		strcat(sql,"' AND HORA < '");
+		strcat(sql,hoy);
+		strcat(sql, "';");
 		rc = sqlite3_exec(db, sql, callback_mintemp, 0, &err_msg);
 		break;
 	}
 	case avgTemp: {
-		char *sql = "SELECT AVG(TEMPERATURA) FROM DATOS;";
+		char sql[100] = "SELECT AVG(TEMPERATURA) FROM DATOS WHERE HORA > '";
+		strcat(sql,ayer);
+		strcat(sql,"' AND HORA < '");
+		strcat(sql,hoy);
+		strcat(sql, "';");
 		rc = sqlite3_exec(db, sql, callback_avgtemp, 0, &err_msg);
 		break;
 	}
 	case horaInicioAlarm: {
-		char *sql = "SELECT MIN(HORA) FROM ALARMAS;";
+		char sql[100] = "SELECT MIN(HORA) FROM ALARMAS WHERE HORA > '";
+		strcat(sql,antesdeayer);
+		strcat(sql, "';");
 		rc = sqlite3_exec(db, sql, callback_horaInicioAlarmas, 0, &err_msg);
 		break;
 	}
 	case horaFinalAlarm: {
-		char *sql = "SELECT MAX(HORA) FROM ALARMAS;";
+		char sql[100] = "SELECT MAX(HORA) FROM ALARMAS WHERE HORA < '";
+		strcat(sql,hoy);
+		strcat(sql, "';");
 		rc = sqlite3_exec(db, sql, callback_horaFinalAlarmas, 0, &err_msg);
 		break;
 	}
 	case tempFanOnAlarm: {
-		char *sql = "SELECT MAX(TEMP_FAN_ON) FROM ALARMAS;";
+		char sql[100] = "SELECT MAX(TEMP_FAN_ON) FROM ALARMAS WHERE HORA > '";
+		strcat(sql,ayer);
+		strcat(sql,"' AND HORA < '");
+		strcat(sql,hoy);
+		strcat(sql, "';");
+		//printf("comando SQL minTemp: %s\n",sql);
 		rc = sqlite3_exec(db, sql, callback_ventAlarmOn, 0, &err_msg);
 		break;
 	}
@@ -291,10 +357,10 @@ int main(int argc, char *argv[])
 		case 'n':
 			nombredb = optarg;
 			break;
-		case 'd':							/** Activa el modo debug*/
+		case 'd':                                                       /** Activa el modo debug*/
 			dvalue = 1;
 			break;
-		case 't':							/** Define el tiempo de muestreo*/
+		case 't':                                                       /** Define el tiempo de muestreo*/
 			tvalue = atoi(optarg);
 			break;
 		case 'h':
@@ -316,7 +382,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	/** Se abre la base de datos.*/
-	if (abrirdb()){
+	if (abrirdb()) {
 		printf("\n No se ha encontrado la base de datos.\n");
 		exit(1);
 	}
@@ -325,6 +391,7 @@ int main(int argc, char *argv[])
 	query(horaFinal);
 	query(maxTemp);
 	query(minTemp);
+	query(avgTemp);
 	query(tempFanOn);
 	printf("\n------------- TABLA ALARMAS -----------------\n");
 	query(horaInicioAlarm);

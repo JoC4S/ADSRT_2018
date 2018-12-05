@@ -1,4 +1,3 @@
-all:
 
 libmail:
 
@@ -8,6 +7,6 @@ libmail:
 
 libmailarm:
 
-	arm-linux-gnueabi-gcc -Wall -fPIC -c -o libmail.o libmail.c -I../include
-	arm-linux-gnueabi-gcc -Wall -shared -fPIC -o ./arm/libmail.so libmail.o -I../inlcude
+	arm-linux-gnueabihf-gcc -Wall -fPIC -c -o libmail.o libmail.c -I../include
+	arm-linux-gnueabihf-gcc -Wall -shared -fPIC -o ./arm/libmail.so libmail.o -I../inlcude
 	rm libmail.o

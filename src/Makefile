@@ -47,20 +47,17 @@ captura_arm:
 
 install:
 	@echo =======================================================
-	@echo Se crea libreria libmail.so para ARM sin crossCompiling
+	@echo Se crea libreria libmail.so para ARM
 	@echo =======================================================
 
-	scp ../lib/libmail.c ../include/libmail.h  pi@192.168.2.199:/tmp
-	ssh pi@192.168.2.199 gcc -fPIC -c -o /tmp/libmail.o /tmp/libmail.c
-	ssh pi@192.168.2.199 gcc -shared -fPIC -o /tmp/libmail.so /tmp/libmail.o
-	ssh pi@192.168.2.199 rm /tmp/libmail.c /tmp/libmail.o /tmp/libmail.h
+	+$(MAKE) -B libmailarm
 
 	@echo ===========================================
 	@echo Se compila programa para ARM
 	@echo ============================================
 
-	arm-linux-gnueabi-gcc -c -o captura_arm.o captura.c -I../include
-	arm-linux-gnueabi-gcc -o captura_arm captura_arm.o -I../include -L./  -lrt -lmail -L../lib/arm/ -lsqlite3
+	arm-linux-gnueabihf-gcc -c -o captura_arm.o captura.c -I../include
+	arm-linux-gnueabihf-gcc -o captura_arm captura_arm.o -I../include -L./  -lrt -lmail -L../lib/arm/ -lsqlite3
 
 	+$(MAKE) -B informe_arm
 
