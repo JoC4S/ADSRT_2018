@@ -100,6 +100,7 @@ int get_str_timestamp(int print, char *buffer)
 		break;
 	case d_hoy:
 		/** Obtiene la fecha actual*/
+		info = localtime( &rawtime );
 		strftime(buffer, 80, "%Y-%m-%d", info);
 		break;
 	case 1:
@@ -251,10 +252,8 @@ int query(int opcion)
 /** asigna adaybefore la misma hora actual del sistema pero 48 horas antes*/
 	memset( hoy, 0, 80 );
 	get_str_timestamp(d_hoy, hoy);
-	memset( hoy, 0, 80 );
+	memset( ayer, 0, 80 );
 	get_str_timestamp(d_ayer, ayer);
-	printf ("variable hoy: %s\n",hoy);
-	printf ("variable ayer: %s\n",ayer);
 
 	switch (opcion) {
 	case horaInicio:
