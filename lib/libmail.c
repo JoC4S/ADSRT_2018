@@ -126,7 +126,7 @@ int sendmail(char *mailto, char *texto_a_enviar, int opcionmail){
 	if (!EUSS){
 		sendTCPData(WAITFOR_ACK,ehlo);
 	}else
-		sendTCPData(WAITFOR_ACK,"HELO host");
+		sendTCPData(WAITFOR_ACK,"helo host\n");
 
 	/*Enviar Solicitud de autorizacion de usuario*/
 	if (!EUSS){

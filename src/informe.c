@@ -68,11 +68,10 @@ char *nombredb = NULL;                          /** Valor del parameto n*/
    \param "print: devuelve dia y hora actual, ayer: devuelve la fecha - 24h", antesdeayer - 48h
    \return "Devuelve puntero a un string con la fecha"
  */
-char* timestamp(int print)
+int get_str_timestamp(int print, char *buffer)
 {
 	time_t rawtime, diaprevio;
 	struct tm *info, *dia_anterior;
-	char buffer[80];
 	char *retp;
 
 	time( &rawtime );
@@ -136,7 +135,7 @@ int abrirdb()
 			return 1;
 		}else {
 			printf("\n<==========================================================>\n");
-			timestamp(PRINT_TIME);
+			get_str_timestamp(PRINT_TIME,NULL);
 			printf("---> Base de datos abierta.\n");
 		}
 	}
@@ -244,13 +243,19 @@ int callback_avgtemp(void *NotUsed, int argc, char **argv, char **azColName)
 int query(int opcion)
 {
 	int rc;
-	char ayer[50];                                                          /** Almacena la fecha y hora de 24 h atras*/
-	char hoy[50];
+	char ayer[80];                                                          /** Almacena la fecha y hora de 24 h atras*/
+	char hoy[80];
 	char sql[100];
 	char *err_msg = 0;
 
-	strcpy(ayer, timestamp(d_ayer));                                                                                                                          /** asigna adaybefore la misma hora actual del sistema pero 48 horas antes*/
-	strcpy(hoy, timestamp(d_hoy));
+/** asigna adaybefore la misma hora actual del sistema pero 48 horas antes*/
+	memset( hoy, 0, 80 );
+	get_str_timestamp(d_hoy, hoy);
+	memset( hoy, 0, 80 );
+	get_str_timestamp(d_ayer, ayer);
+	printf ("variable hoy: %s\n",hoy);
+	printf ("variable ayer: %s\n",ayer);
+
 	switch (opcion) {
 	case horaInicio:
 		sprintf (sql, "SELECT MIN(HORA) FROM DATOS WHERE HORA > '%s'AND HORA < '%s';",ayer,hoy);
@@ -352,7 +357,7 @@ int main(int argc, char *argv[])
 	query(horaFinalAlarm);
 	query(tempFanOnAlarm);
 	printf("\n<==========================================================>\n");
-	timestamp(PRINT_TIME);
+	get_str_timestamp(PRINT_TIME, NULL);
 	/** Se ciera la base de datos.*/
 	sqlite3_close(db);
 	printf("---> Base de datos cerrada.\n");
