@@ -35,20 +35,19 @@
 #include <sys/types.h>
 #include "libmail.h"
 
-#define PRINT_TIME 1                            /** Para funcion timestamp(). Idica que se imprimira la hora por patnalla.*/
-#define horaInicio  0                           /** Opción para funcion Query. Solicita hora de inicio.*/
-#define horaFinal  1                            /** Opción para funcion Query. Solicita hora de final.*/
-#define tempFanOn 3                             /** Opción para funcion Query. Solicita tiempo que ha estado funcionando el ventilador.*/
-#define maxTemp  4                              /** Opción para funcion Query. Solicita la máxima temperatura registrada.*/
-#define minTemp 5                               /** Opción para funcion Query. Solicita la mínima temperatura registrada.*/
-#define avgTemp 6                               /** Opción para funcion Query. Solicita la temperatura media de todo el registro.*/
-#define horaInicioAlarm  7                      /** Opción para funcion Query. Solicita hora de inicio de las alarmas.*/
-#define horaFinalAlarm  8                       /** Opción para funcion Query. Solicita hora final de las alarmas.*/
-#define tempFanOnAlarm 9                        /** Opción para funcion Query. Solicita tiempo que ha estado funcionando el ventilador con estado de alarma.*/
+#define PRINT_TIME 1            /** Para funcion timestamp(). Idica que se imprimira la hora por patnalla.*/
+#define horaInicio  0           /** Opción para funcion Query. Solicita hora de inicio.*/
+#define horaFinal  1            /** Opción para funcion Query. Solicita hora de final.*/
+#define tempFanOn 3             /** Opción para funcion Query. Solicita tiempo que ha estado funcionando el ventilador.*/
+#define maxTemp  4              /** Opción para funcion Query. Solicita la máxima temperatura registrada.*/
+#define minTemp 5               /** Opción para funcion Query. Solicita la mínima temperatura registrada.*/
+#define avgTemp 6               /** Opción para funcion Query. Solicita la temperatura media de todo el registro.*/
+#define horaInicioAlarm  7      /** Opción para funcion Query. Solicita hora de inicio de las alarmas.*/
+#define horaFinalAlarm  8       /** Opción para funcion Query. Solicita hora final de las alarmas.*/
+#define tempFanOnAlarm 9        /** Opción para funcion Query. Solicita tiempo que ha estado funcionando el ventilador con estado de alarma.*/
 
-#define d_ayer 2
-#define d_antesdeayer 3
-#define d_hoy 4
+#define d_ayer 2                /** parametro para funcion timestamp(). Hace que la funcion devuelva la fecha del sistema del dia anterior*/
+#define d_hoy 4                 /** parametro para funcion timestamp(). Hace que la funcion devuelva la fecha del sistema del dia en curso*/
 
 
 
@@ -72,9 +71,10 @@ char *nombredb = NULL;                          /** Valor del parameto n*/
 char* timestamp(int print)
 {
 	time_t rawtime, diaprevio;
-	struct tm *info, *dia_anterior, *hoy;
+	struct tm *info, *dia_anterior;
 	char buffer[80];
 	char *retp;
+
 	time( &rawtime );
 
 	info = localtime( &rawtime );
@@ -93,34 +93,24 @@ char* timestamp(int print)
 	//};
 
 	switch (print) {
-	case d_ayer: {                                          	/** Resta 24h a la fecha actual*/
-		diaprevio = rawtime -86400;
+	case d_ayer:
+		/** Resta 24h a la fecha actual*/
+		diaprevio = rawtime - 86400;
 		dia_anterior = localtime(&diaprevio);
-		strftime(buffer,80,"%Y-%m-%d", info);
+		strftime(buffer, 80, "%Y-%m-%d", dia_anterior);
 		break;
-	}
-	case d_antesdeayer: {                                           /** Resta 48h a la fecha actual*/
-		diaprevio = rawtime - (86400*2);
-		dia_anterior = localtime(&diaprevio);
-		strftime(buffer,80,"%Y-%m-%d", info);
+	case d_hoy:
+		/** Obtiene la fecha actual*/
+		strftime(buffer, 80, "%Y-%m-%d", info);
 		break;
-	}
-	case d_hoy: {							/** Obtiene la fecha actual*/				
-		hoy = localtime(&rawtime);
-		strftime(buffer,80,"%Y-%m-%d", info);
-		break;
-	}
-	case 1: {
-		strftime(buffer,80,"%Y-%m-%d %H:%M:%S", info);
+	case 1:
+		strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", info);
 		printf(COLOR_YELLOW "%s" COLOR_RESET, buffer );
 		break;
-	}
-	default: {
-		strftime(buffer,80,"%Y-%m-%d %H:%M:%S", info);
+	default:
+		strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", info);
 		break;
 	}
-	}
-
 	retp = buffer;
 	return retp;
 }
@@ -130,21 +120,21 @@ char* timestamp(int print)
    \pre   "La base de datos debe existir"
    \return "FAlse = OK, True = ERROR"
  */
-int abrirdb(){
-
+int abrirdb()
+{
 	/** Abrimos la base de datos.*/
 	int rc;
+
 	printf("Abriendo base de datos '%s'...\n", nombredb);
 	rc = sqlite3_open(nombredb, &db);
 	if ( rc ) {
-		fprintf(stderr,COLOR_RED "---> No se puede abrir la base de datos: %s\n" COLOR_RESET, sqlite3_errmsg(db));
+		fprintf(stderr, COLOR_RED "---> No se puede abrir la base de datos: %s\n" COLOR_RESET, sqlite3_errmsg(db));
 		return 0;
 	} else {
 		if (nombredb == NULL) {
-			fprintf(stderr,COLOR_RED " ERROR: Se necesita un nombre para la base de datos.\n" COLOR_RESET);
+			fprintf(stderr, COLOR_RED " ERROR: Se necesita un nombre para la base de datos.\n" COLOR_RESET);
 			return 1;
-		}
-		else{
+		}else {
 			printf("\n<==========================================================>\n");
 			timestamp(PRINT_TIME);
 			printf("---> Base de datos abierta.\n");
@@ -153,95 +143,97 @@ int abrirdb(){
 	return 0;
 }
 
-int callback_horaInicio(void *NotUsed, int argc, char **argv, char **azColName) {
-
+int callback_horaInicio(void *NotUsed, int argc, char **argv, char **azColName)
+{
 	NotUsed = 0;
-	printf("Hora Inicio = %s.\n",argv[0] );
-	sprintf (informe, "Hora Inicio = %s.\n",argv[0]);
-	strcat(mail_informe,informe);
-
+	printf("Hora Inicio = %s.\n", argv[0] );
+	sprintf(informe, "Hora Inicio = %s.\n", argv[0]);
+	strcat(mail_informe, informe);
 	return 0;
 }
 
-int callback_horaInicioAlarmas(void *NotUsed, int argc, char **argv, char **azColName) {
-
+int callback_horaInicioAlarmas(void *NotUsed, int argc, char **argv, char **azColName)
+{
 	NotUsed = 0;
-	printf("Hora Inicio Alarmas = %s.\n",argv[0] );
-	sprintf (informe, "Hora Inicio Alarmas = %s.\n",argv[0] );
-	strcat(mail_informe,informe);
-
+	printf("Hora Inicio Alarmas = %s.\n", argv[0] );
+	sprintf(informe, "Hora Inicio Alarmas = %s.\n", argv[0] );
+	strcat(mail_informe, informe);
 	return 0;
 }
 
-int callback_horaFinalAlarmas(void *NotUsed, int argc, char **argv, char **azColName) {
-
+int callback_horaFinalAlarmas(void *NotUsed, int argc, char **argv, char **azColName)
+{
 	NotUsed = 0;
-	printf("Hora Final Alarmas = %s.\n",argv[0] );
-	sprintf (informe, "Hora Final Alarmas = %s.\n",argv[0] );
-	strcat(mail_informe,informe);
-
+	printf("Hora Final Alarmas = %s.\n", argv[0] );
+	sprintf(informe, "Hora Final Alarmas = %s.\n", argv[0] );
+	strcat(mail_informe, informe);
 	return 0;
 }
 
-int callback_horaFinal(void *NotUsed, int argc, char **argv, char **azColName) {
-
+int callback_horaFinal(void *NotUsed, int argc, char **argv, char **azColName)
+{
 	NotUsed = 0;
-	printf("Hora Final = %s.\n",argv[0] );
-	sprintf (informe, "Hora Final = %s.\n",argv[0] );
-	strcat(mail_informe,informe);
-
+	printf("Hora Final = %s.\n", argv[0] );
+	sprintf(informe, "Hora Final = %s.\n", argv[0] );
+	strcat(mail_informe, informe);
 	return 0;
 }
 
-int callback_fanOn(void *NotUsed, int argc, char **argv, char **azColName) {
-
+int callback_fanOn(void *NotUsed, int argc, char **argv, char **azColName)
+{
 	NotUsed = 0;
-	int fanOn = 0;
-	fanOn = atoi(argv[0]) * 10;
-	int fanOnAvg = (atoi(argv[0])*10/atoi(argv[0]));
-	printf("Temp Fan On = %d s.\n",fanOn );
-	sprintf (informe, "Temp Fan On = %d s.\n",fanOn);
-	strcat(mail_informe,informe);
-	printf ("Temp AVG On = %d s.\n",fanOnAvg);
-	sprintf (informe, "Temp AVG On = %d s.\n",fanOnAvg);
-	strcat(mail_informe,informe);
+	int fanOn;
+	int fanOnAvg;
 
+	if (argv[0] != NULL){
+		fanOn = atoi(argv[0]) * 10;
+		fanOnAvg = (atoi(argv[0]) * 10 / atoi(argv[0]));
+	}else {
+		fanOn = 0;
+		fanOnAvg = 0;
+	}
+	printf("Temp Fan On = %d s.\n", fanOn );
+	sprintf(informe, "Temp Fan On = %d s.\n", fanOn);
+	strcat(mail_informe, informe);
+	printf("Temp AVG On = %d s.\n", fanOnAvg);
+	sprintf(informe, "Temp AVG On = %d s.\n", fanOnAvg);
+	strcat(mail_informe, informe);
 	return 0;
 }
 
-int callback_ventAlarmOn(void *NotUsed, int argc, char **argv, char **azColName) {
-
+int callback_ventAlarmOn(void *NotUsed, int argc, char **argv, char **azColName)
+{
 	NotUsed = 0;
-	printf("Temp Fan Alarm On = %s min.\n",argv[0] );
-	sprintf (informe, "Temp Fan Alarm On = %s min.\n",argv[0]);
-	strcat(mail_informe,informe);
+	printf("Temp Fan Alarm On = %s min.\n", argv[0] );
+	sprintf(informe, "Temp Fan Alarm On = %s min.\n", argv[0]);
+	strcat(mail_informe, informe);
 	return 0;
 }
 
-int callback_maxtemp(void *NotUsed, int argc, char **argv, char **azColName) {
-
+int callback_maxtemp(void *NotUsed, int argc, char **argv, char **azColName)
+{
 	NotUsed = 0;
-	printf("Máximo = %s ºC\n",argv[0] );
-	sprintf (informe, "Máximo = %s ºC\n",argv[0] );
-	strcat(mail_informe,informe);
+	printf("Máximo = %s ºC\n", argv[0] );
+	sprintf(informe, "Máximo = %s ºC\n", argv[0] );
+	strcat(mail_informe, informe);
 	return 0;
 }
 
-int callback_mintemp(void *NotUsed, int argc, char **argv, char **azColName) {
-
+int callback_mintemp(void *NotUsed, int argc, char **argv, char **azColName)
+{
 	NotUsed = 0;
-	printf("mínimo = %s ºC\n",argv[0] );
-	sprintf (informe, "mínimo = %s ºC\n",argv[0]  );
-	strcat(mail_informe,informe);
+	printf("mínimo = %s ºC\n", argv[0] );
+	sprintf(informe, "mínimo = %s ºC\n", argv[0]  );
+	strcat(mail_informe, informe);
 	return 0;
 }
 
-int callback_avgtemp(void *NotUsed, int argc, char **argv, char **azColName) {
-
+int callback_avgtemp(void *NotUsed, int argc, char **argv, char **azColName)
+{
 	NotUsed = 0;
-	printf("Media = %s ºC\n",argv[0] );
-	sprintf (informe, "Media = %s ºC\n",argv[0] );
-	strcat(mail_informe,informe);
+	printf("Media = %s ºC\n", argv[0] );
+	sprintf(informe, "Media = %s ºC\n", argv[0] );
+	strcat(mail_informe, informe);
 	return 0;
 }
 /*!
@@ -249,96 +241,57 @@ int callback_avgtemp(void *NotUsed, int argc, char **argv, char **azColName) {
    \param Opcione: horaInicio, horaFinal, tampFanOn, maxTemp, minTemp, avgTemp
    \return "Return of the function"
  */
-int query(int opcion){
-
+int query(int opcion)
+{
 	int rc;
 	char ayer[50];                                                          /** Almacena la fecha y hora de 24 h atras*/
-	char antesdeayer[50];
 	char hoy[50];
+	char sql[100];
 	char *err_msg = 0;
 
-	strcpy (ayer, timestamp(d_ayer));                                       /** asigna adaybefore la misma hora actual del sistema pero 24 horas antes*/
-	strcpy (antesdeayer, timestamp(d_antesdeayer));                         /** asigna adaybefore la misma hora actual del sistema pero 48 horas antes*/
-	strcpy (hoy, timestamp(d_hoy));
+	strcpy(ayer, timestamp(d_ayer));                                                                                                                          /** asigna adaybefore la misma hora actual del sistema pero 48 horas antes*/
+	strcpy(hoy, timestamp(d_hoy));
 	switch (opcion) {
-	case horaInicio: {
-		char sql[100] = "SELECT MIN(HORA) FROM DATOS WHERE HORA > '";
-		strcat(sql,antesdeayer);
-		strcat(sql, "';");
+	case horaInicio:
+		sprintf (sql, "SELECT MIN(HORA) FROM DATOS WHERE HORA > '%s'AND HORA < '%s';",ayer,hoy);
 		rc = sqlite3_exec(db, sql, callback_horaInicio, 0, &err_msg);
 		break;
-	}
-	case horaFinal: {
-		char sql[100] = "SELECT MAX(HORA) FROM DATOS WHERE HORA < '";
-		strcat(sql,hoy);
-		strcat(sql, "';");
+	case horaFinal:
+		sprintf(sql,"SELECT MAX(HORA) FROM DATOS WHERE HORA > '%s' AND HORA < '%s';",ayer,hoy);
 		rc = sqlite3_exec(db, sql, callback_horaFinal, 0, &err_msg);
 		break;
-	}
-	case tempFanOn: {
-		char sql[100] = "SELECT SUM(VENTILADOR) FROM DATOS WHERE HORA > '";
-		strcat(sql,ayer);
-		strcat(sql,"' AND HORA < '");
-		strcat(sql,hoy);
-		strcat(sql, "';");
+	case tempFanOn:
+		sprintf(sql,"SELECT SUM(VENTILADOR) FROM DATOS WHERE HORA > '%s' AND HORA < '%s';",ayer,hoy);
 		rc = sqlite3_exec(db, sql, callback_fanOn, 0, &err_msg);
 		break;
-	}
-	case maxTemp: {
-		char sql[100] = "SELECT MAX(TEMPERATURA) FROM DATOS WHERE HORA > '";
-		strcat(sql,ayer);
-		strcat(sql,"' AND HORA < '");
-		strcat(sql,hoy);
-		strcat(sql, "';");
+	case maxTemp:
+		sprintf(sql, "SELECT MAX(TEMPERATURA) FROM DATOS WHERE HORA > '%s' AND HORA < '%s';",ayer,hoy);
 		rc = sqlite3_exec(db, sql, callback_maxtemp, 0, &err_msg);
 		break;
-	}
-	case minTemp: {
-		char sql[100] = "SELECT MIN(TEMPERATURA) FROM DATOS WHERE HORA > '";
-		strcat(sql,ayer);
-		strcat(sql,"' AND HORA < '");
-		strcat(sql,hoy);
-		strcat(sql, "';");
+	case minTemp:
+		sprintf(sql, "SELECT MIN(TEMPERATURA) FROM DATOS WHERE HORA > '%s' AND HORA < '%s';",ayer,hoy);
 		rc = sqlite3_exec(db, sql, callback_mintemp, 0, &err_msg);
 		break;
-	}
-	case avgTemp: {
-		char sql[100] = "SELECT AVG(TEMPERATURA) FROM DATOS WHERE HORA > '";
-		strcat(sql,ayer);
-		strcat(sql,"' AND HORA < '");
-		strcat(sql,hoy);
-		strcat(sql, "';");
+	case avgTemp:
+		sprintf(sql,"SELECT AVG(TEMPERATURA) FROM DATOS WHERE HORA > '%s' AND HORA < '%s';",ayer,hoy);
 		rc = sqlite3_exec(db, sql, callback_avgtemp, 0, &err_msg);
 		break;
-	}
-	case horaInicioAlarm: {
-		char sql[100] = "SELECT MIN(HORA) FROM ALARMAS WHERE HORA > '";
-		strcat(sql,antesdeayer);
-		strcat(sql, "';");
+	case horaInicioAlarm:
+		sprintf(sql, "SELECT MIN(HORA) FROM ALARMAS WHERE HORA > '%s';",ayer);
 		rc = sqlite3_exec(db, sql, callback_horaInicioAlarmas, 0, &err_msg);
 		break;
-	}
-	case horaFinalAlarm: {
-		char sql[100] = "SELECT MAX(HORA) FROM ALARMAS WHERE HORA < '";
-		strcat(sql,hoy);
-		strcat(sql, "';");
+	case horaFinalAlarm:
+		sprintf(sql, "SELECT MAX(HORA) FROM ALARMAS WHERE HORA  > '%s' AND HORA < '%s';",ayer,hoy);
 		rc = sqlite3_exec(db, sql, callback_horaFinalAlarmas, 0, &err_msg);
 		break;
-	}
-	case tempFanOnAlarm: {
-		char sql[100] = "SELECT MAX(TEMP_FAN_ON) FROM ALARMAS WHERE HORA > '";
-		strcat(sql,ayer);
-		strcat(sql,"' AND HORA < '");
-		strcat(sql,hoy);
-		strcat(sql, "';");
+	case tempFanOnAlarm:
+		sprintf(sql, "SELECT MAX(TEMP_FAN_ON) FROM ALARMAS WHERE HORA > '%s' AND HORA < '%s';",ayer,hoy);
 		//printf("comando SQL minTemp: %s\n",sql);
 		rc = sqlite3_exec(db, sql, callback_ventAlarmOn, 0, &err_msg);
 		break;
 	}
-	}
 
 	if (rc != SQLITE_OK ) {
-
 		fprintf(stderr, "Failed to select data\n");
 		fprintf(stderr, "SQL error: %s\n", err_msg);
 		sqlite3_free(err_msg);
@@ -352,15 +305,16 @@ int main(int argc, char *argv[])
 {
 	int dvalue = 0;
 	int c;
+
 	while ((c = getopt(argc, argv, "n:t:hd")) != -1) {
 		switch (c) {
 		case 'n':
 			nombredb = optarg;
 			break;
-		case 'd':                                                       /** Activa el modo debug*/
+		case 'd':                                                                                                                                                         /** Activa el modo debug*/
 			dvalue = 1;
 			break;
-		case 't':                                                       /** Define el tiempo de muestreo*/
+		case 't':                                                                                                                                                         /** Define el tiempo de muestreo*/
 			tvalue = atoi(optarg);
 			break;
 		case 'h':
@@ -386,7 +340,7 @@ int main(int argc, char *argv[])
 		printf("\n No se ha encontrado la base de datos.\n");
 		exit(1);
 	}
-	printf("\n------------- TABLA DATOS -------------------\n");
+	printf("\n------------- TABLA DATOS -------------------\n\n");
 	query(horaInicio);
 	query(horaFinal);
 	query(maxTemp);
@@ -403,8 +357,9 @@ int main(int argc, char *argv[])
 	sqlite3_close(db);
 	printf("---> Base de datos cerrada.\n");
 	printf("---> Mandando Informe.\n");
-	char mailto[] = "jose.cayero@me.com";
-	sendmail(mailto, mail_informe);
+	char mailto[] = "1104934@campus.euss.org";
+	printf("%s",mail_informe);
+	sendmail(mailto, mail_informe, EUSS);
 
 	return 0;
 }

@@ -49,7 +49,7 @@
 
 struct sockaddr_in serverAddr;
 //char serverName[] = "172.20.0.21";                                            //Adreça IP on està el client EUSS
-char serverName[] = "127.0.0.1";                                                //Adreça IP on està el client HOME
+//char serverName[] = "127.0.0.1";                                                //Adreça IP on està el client HOME
 
 int sockAddrSize;
 int sFd;
@@ -83,8 +83,9 @@ void sendTCPData (int opcion, char *msg){
 /************************
 * tcpClient
 ************************/
-int sendmail(char *mailto, char *texto_a_enviar){
+int sendmail(char *mailto, char *texto_a_enviar, int opcionmail){
 
+	char serverName[15] = "";
 	/*Crear el socket*/
 	sFd=socket(AF_INET,SOCK_STREAM,0);
 
@@ -93,6 +94,12 @@ int sendmail(char *mailto, char *texto_a_enviar){
 	bzero ((char *)&serverAddr, sockAddrSize); //Posar l'estructura a zero
 	serverAddr.sin_family=AF_INET;
 	serverAddr.sin_port=htons (SERVER_PORT_NUM);
+	if (!EUSS){
+		strcpy(serverName,"127.0.0.1");
+	}else{
+		strcpy(serverName,"172.20.0.21");
+	}
+
 	serverAddr.sin_addr.s_addr = inet_addr(serverName);
 
 	/*Conexió*/
@@ -116,16 +123,19 @@ int sendmail(char *mailto, char *texto_a_enviar){
 	strcat (maildestino, ">\n");
 	printf("Destinatario: %s", maildestino);
 
-	sendTCPData(WAITFOR_ACK,ehlo);
+	if (!EUSS){
+		sendTCPData(WAITFOR_ACK,ehlo);
+	}else
+		sendTCPData(WAITFOR_ACK,"HELO host");
 
 	/*Enviar Solicitud de autorizacion de usuario*/
-	sendTCPData(WAITFOR_ACK,authlogin);
-
-	/*Enviar usuario encriptado*/
-	sendTCPData(WAITFOR_ACK,mailuser64);
-
-	/*Enviar pass usuario encriptado*/
-	sendTCPData(WAITFOR_ACK,userpass64);
+	if (!EUSS){
+		sendTCPData(WAITFOR_ACK,authlogin);
+		/*Enviar usuario encriptado*/
+		sendTCPData(WAITFOR_ACK,mailuser64);
+		/*Enviar pass usuario encriptado*/
+		sendTCPData(WAITFOR_ACK,userpass64);
+	}
 
 	/*Enviar remitente*/
 	sendTCPData(WAITFOR_ACK,mailfrom);
