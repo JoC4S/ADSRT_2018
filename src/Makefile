@@ -73,3 +73,7 @@ libmail:
 
 libmailarm:
 	+$(MAKE) libmailarm -C ../lib/
+
+webserver:
+	gcc -c -o webserver.o webserver.c
+	gcc -o webserver webserver.o
