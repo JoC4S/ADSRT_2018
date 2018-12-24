@@ -28,7 +28,7 @@ informe_arm:
 	arm-linux-gnueabihf-gcc -c -o informe_arm.o informe.c -I../include
 	arm-linux-gnueabihf-gcc -o informe_arm informe_arm.o -lrt -I../include -L../lib/arm -lmail -lsqlite3
 	cp informe_arm ../bin/arm
-	scp ../bin/arm/informe_arm pi@192.168.2.199:/tmp
+	scp ../bin/arm/informe_arm pi@172.28.10.202:/tmp
 	rm informe_arm.o informe_arm
 
 captura_arm:
@@ -42,7 +42,7 @@ captura_arm:
 	@echo =======================================================
 	@echo Se copian ejecutable y librerias en Raspberry
 	@echo =======================================================
-	scp ../lib/arm/libmail.so captura_arm ../lib/arm/libsqlite3.so ../script/scaptura_arm.sh pi@192.168.2.199:/tmp
+	scp ../lib/arm/libmail.so captura_arm ../lib/arm/libsqlite3.so ../script/scaptura_arm.sh pi@172.28.10.202:/tmp
 	rm captura_arm.o captura_arm
 
 install:
@@ -65,7 +65,7 @@ install:
 	@echo Se copian ejecutable 'captura', librerias y scropts en Raspberry
 	@echo =================================================================
 
-	scp captura_arm ../script/captura.db ../lib/arm/libsqlite3.so ../lib/arm/libmail.so ../script/scaptura_arm.sh ../script/sinforme_arm.sh pi@192.168.2.199:/tmp
+	scp captura_arm ../script/captura.db ../lib/arm/libsqlite3.so ../lib/arm/libmail.so ../script/scaptura_arm.sh ../script/sinforme_arm.sh pi@172.28.10.202:/tmp
 	rm captura_arm.o captura_arm
 
 libmail:
