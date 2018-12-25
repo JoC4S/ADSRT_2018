@@ -112,7 +112,7 @@ int tcp_cmd_fita3( int newsockfd, char *buffer)
 
 	const char example[] = "HTTP/1.1 200 OK\r\nDate: Wen, 2 Dec 2015 13:40:00 GMT\r\nContent-Type: application/html\r\nKeep-Alive: timeout=2, max=100\r\nConnection: Keep-Alive\r\n";
 
-	const char *web= ""<!DOCTYPE HTML> 
+	const char *web= ""<!DOCTYPE HTML>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
