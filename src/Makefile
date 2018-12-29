@@ -76,4 +76,7 @@ libmailarm:
 
 webserver:
 	gcc -c -o webserver.o webserver.c
-	gcc -o webserver webserver.o
+	gcc -o webserver webserver.o -lsqlite3
+fichero:
+	gcc -c -o ejemplolectura_fichero.o ejemplolectura_fichero.c
+	gcc -o ejemplolectura_fichero ejemplolectura_fichero.o

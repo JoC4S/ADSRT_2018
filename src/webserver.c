@@ -23,191 +23,135 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sqlite3.h>
+#include <time.h>
+
+int webfile_read(char *fichero, char *str);
+
+#define COLOR_GREEN "\x1B[32m"
+#define COLOR_RED "\x1B[31m"
+#define COLOR_YELLOW "\x1B[33m"
+#define COLOR_RESET "\033[0m"
+#define PRINT_TIME 1                            /** Para funcion timestamp(). Idica que se imprimira la hora por patnalla.*/
 
 
 // max size
-#define BUFFSIZE 1024*1000
+#define BUFFSIZE 1024 * 1000
 
-#define TCPDEBUG(x...) printf(x)
+#define TCPDEBUG(x ...) printf(x)
 //#define TCPDEBUG(x...)
 
-int global_mesura = 0;
+float global_angulo;
 
+/*!
+   \brief "Obtencion de fecha con formato sqlite DATETIME"
+   \param "No tiene parametros"
+   \return "Devuelve puntero a un string con la fecha"
+ */
+char* timestamp(int print)
+{
+	time_t rawtime;
+	struct tm *info;
+	char buffer[80];
+	char *retp;
+
+	time( &rawtime );
+
+	info = localtime( &rawtime );
+	//El valor de retorn es a una variable de tipus timei_t, on posaràl temps en segons des de 1970-01-01 00:00:00 +0000 (UTC)
+
+	strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", info);
+	if (print) {
+		printf(COLOR_YELLOW "%s" COLOR_RESET, buffer );
+	}
+	retp = buffer;
+	return retp;
+}
+
+/*!
+   \brief Obtiene el dato máximo de ángulo y lo convierte en float para pasarlo a la vriable global
+   \param "Param description"
+   \return "Return of the function"
+ */
+int callback_angulo(void *NotUsed, int argc, char **argv, char **azColName)
+{
+	char angulo[100];
+
+	bzero(angulo, 100);
+	NotUsed = 0;
+	strcpy(angulo, argv[0]);
+	global_angulo = atof(angulo);
+	printf("Angulo = %f ºC\n", global_angulo );
+	return 0;
+}
+/*!
+   \brief Obtiene el angulo de la base de datos
+   \param "Param description"
+   \pre "Pre-conditions"
+   \post "Post-conditions"
+   \return "Return of the function"
+ */
+int get_angle(void)
+{
+
+	sqlite3 *db;
+	static char *nombredb = "example.db";
+	int rc;
+	char sql[100];
+	char *err_msg = 0;
+
+	/** Se abre base de datos para obtener el último ángulo registrado*/
+	rc = sqlite3_open(nombredb, &db);
+	if ( rc ) {
+		fprintf(stderr, COLOR_RED "---> No se puede abrir la base de datos: %s\n" COLOR_RESET, sqlite3_errmsg(db));
+		return 0;
+	} else {
+
+		printf("\n<==========================================================>\n");
+		timestamp(PRINT_TIME);
+		printf("---> Base de datos %s abierta.\n", nombredb);
+	}
+	/** Buscamos el ultimo dato de inclinacion*/
+	sprintf(sql, "SELECT Inclinacion FROM angulo WHERE Ind = (SELECT MAX(Ind) from angulo);");
+	rc = sqlite3_exec(db, sql, callback_angulo, 0, &err_msg);
+	/** Se cierra la base de datos*/
+	sqlite3_close(db);
+	timestamp(PRINT_TIME);
+	printf("---> Base de datos %s cerrada.\n", nombredb);
+	printf("<==========================================================>\n\n");
+	return 0;
+
+}
 int tcp_cmd_captura( int newsockfd, char *buffer)
 {
 	int result;
 	char resposta[BUFFSIZE];
-	bzero(resposta,BUFFSIZE);
 
+	bzero(resposta, BUFFSIZE);
+	char web[2000];
+	bzero(web, 2000);
 
+	const char *httpheader = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
 	TCPDEBUG("Found LOCAL URL webservice:[%s]\n", "captura.html" );
-
-	/*
-	HTTP/1.1 200 OK
-	Date: Wed, 01 Jun 2011 18:36:38 GMT
-	Server: Apache/2.2.14 (Ubuntu)
-	Content-Type: text/html
-
-	<HTML>
-	<HEAD>
-	</HEAD>
-	<BODY>
-	...
-	</BODY>
-	</HTML>
-	*/
-	const char *httpheader = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
-
-	const char example[] = "HTTP/1.1 200 OK\r\nDate: Wen, 2 Dec 2015 13:40:00 GMT\r\nContent-Type: application/html\r\nKeep-Alive: timeout=2, max=100\r\nConnection: Keep-Alive\r\n";
-
-	const char *web="<html> \r\n\
-	 <head> \r\n\
-	  <title>ADST - Captura</title> \r\n\
-	 </head> \r\n\
-	 <body bgcolor=\"#FFFFC0\"> \r\n\
-	  <h1 align=\"center\">Captura: %d</h1> \r\n\
-	  Exemple de com funciona el <strong>servidor web</strong>. Hem incrementat<br>\r\n\
-	  Per Incrementar cal fer click <a href=\"http://localhost:8000/captura.html\">aqui</a> <br>\r\n\
-	  Per Decrementar cal fer click <a href=\"http://localhost:8000/decrementa.html\">aqui</a>\r\n\
-	 </body> \r\n\
-	</html>\r\n";
-
-	global_mesura++;
+	get_angle();
+	webfile_read("grafico.html", web);
 
 	char htmlweb[BUFFSIZE];
-	bzero(htmlweb,BUFFSIZE);
-	sprintf(htmlweb, web, global_mesura);
-
-	sprintf(resposta,"%sContent-Length: %d\r\n\r\n%s", httpheader, (int)strlen(htmlweb), htmlweb);
+	bzero(htmlweb, BUFFSIZE);
+	sprintf(htmlweb, web, global_angulo);
+	sprintf(resposta, "%sContent-Length: %d\r\n\r\n%s", httpheader, (int)strlen(htmlweb), htmlweb);
 
 	result = write(newsockfd, resposta, strlen(resposta));
-	TCPDEBUG("SENDED:[%s]\n", resposta );
+	//TCPDEBUG("SENDED:[%s] ", resposta );
 
 	return result;
 }
-int tcp_cmd_fita3( int newsockfd, char *buffer)
-{
-	int result;
-	char resposta[BUFFSIZE];
-	bzero(resposta,BUFFSIZE);
-
-
-	TCPDEBUG("Found LOCAL URL webservice:[%s]\n", "fita3.html" );
-
-	/*
-	HTTP/1.1 200 OK
-	Date: Wed, 01 Jun 2011 18:36:38 GMT
-	Server: Apache/2.2.14 (Ubuntu)
-	Content-Type: text/html
-
-	<HTML>
-	<HEAD>
-	</HEAD>
-	<BODY>
-	...
-	</BODY>
-	</HTML>
-	*/
-	const char *httpheader = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
-
-	const char example[] = "HTTP/1.1 200 OK\r\nDate: Wen, 2 Dec 2015 13:40:00 GMT\r\nContent-Type: application/html\r\nKeep-Alive: timeout=2, max=100\r\nConnection: Keep-Alive\r\n";
-
-	const char *web= ""<!DOCTYPE HTML>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>fascinating - HTML5 CANVAS 3D CUBES demo</title>
-</head>
-<body>
-<div id="screen">
-<canvas id="canvas">HTML5 CANVAS</canvas>
-<div id="info">
-	<div class="background"></div>
-		<div class="content">
-			<h1>3D Cubes</h1>
-			<table>
-				<tr><td class="w">drag</td><td>→ rotate X,Y axis</td></tr>
-				<tr><td class="w">wheel</td><td>→ rotate Z axis</td></tr>
-				<tr><td class="w">click</td><td>→ create cube</td></tr>
-			</table>
-			<hr>
-			<input type="checkbox" id="white"><label for="white"> white background</label><br>
-			<input type="checkbox" id="alpha"><label for="alpha"> transparency</label><br>
-			<input type="checkbox" id="autor"><label for="autor"> auto rotation</label><br>
-			<input type="checkbox" id="destroy"><label for="destroy"> destroy cubes</label><br>
-			<hr>
-			- <span id="fps" class="w">00</span> FPS<br>
-			- <span id="npoly" class="w">00</span> Faces<br>
-			<p align="center"><input type="button" value="RESET" id="reset" class="button"></input><input type="button" value="STOP" id="stopgo" class="button"></input></p>
-		</div>
-	</div>
-</div>
-
-</body>
-</html>
-
-
-	global_mesura++;
-
-	char htmlweb[BUFFSIZE];
-	bzero(htmlweb,BUFFSIZE);
-	sprintf(htmlweb, web, global_mesura);
-
-	sprintf(resposta,"%sContent-Length: %d\r\n\r\n%s", httpheader, (int)strlen(htmlweb), htmlweb);
-
-	result = write(newsockfd, resposta, strlen(resposta));
-	TCPDEBUG("SENDED:[%s]\n", resposta );
-
-	return result;
-}
-
-int tcp_cmd_decrementa( int newsockfd, char *buffer)
-{
-	int result;
-	char resposta[BUFFSIZE];
-	bzero(resposta,BUFFSIZE);
-
-
-	TCPDEBUG("Found LOCAL URL webservice:[%s]\n", "decrementa.html" );
-
-
-	const char *httpheader = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
-
-	//const char example[] = "HTTP/1.1 200 OK\r\nDate: Fri, 31 Dec 1999 23:59:59 GMT\r\nContent-Type: application/xml\r\n";
-	const char example[] = "HTTP/1.1 200 OK\r\nDate: Fri, 31 Dec 1999 23:59:59 GMT\r\nContent-Type: application/xml\r\nKeep-Alive: timeout=2, max=100\r\nConnection: Keep-Alive\r\n";
-
-	const char *web="<html> \r\n\
-	 <head> \r\n\
-	  <title>ADST - Captura</title> \r\n\
-	 </head> \r\n\
-	 <body bgcolor=\"#C0FFFF\"> \r\n\
-	  <h1 align=\"center\">Captura: %d</h1> \r\n\
-	  Exemple de com funciona el <strong>servidor web</strong>. Hem decrementat<br>\r\n\
-	  Per Incrementar cal fer click <a href=\"http://localhost:8000/captura.html\">aqui</a> <br>\r\n\
-	  Per Decrementar cal fer click <a href=\"http://localhost:8000/decrementa.html\">aqui</a>\r\n\
-	 </body> \r\n\
-	</html>\r\n";
-
-	global_mesura--;
-
-	char htmlweb[BUFFSIZE];
-	bzero(htmlweb,BUFFSIZE);
-	sprintf(htmlweb, web, global_mesura);
-
-	sprintf(resposta,"%sContent-Length: %d\r\n\r\n%s", httpheader, (int)strlen(htmlweb), htmlweb);
-
-	result = write(newsockfd, resposta, strlen(resposta));
-	TCPDEBUG("SENDED:[%s]\n", resposta );
-
-	return result;
-}
-
 
 int tcp_cmd_error( int newsockfd, char *buffer )
 {
 	int result;
 
-	const char *error_http_msg="HTTP/1.1 404 Not Found \r\n\
+	const char *error_http_msg = "HTTP/1.1 404 Not Found \r\n\
 Content-Type: text/html \r\n\
 Content-Length: 345 \r\n\
 Date: Thu, 01 Jan 1970 06:31:10 GMT \r\n\
@@ -224,11 +168,12 @@ Server: lighttpd/1.4.26 \r\n\
   <h1>404 - Not Found</h1> \r\n\
  </body> \r\n\
 </html>\r\n";
-	bzero(buffer,BUFFSIZE);
 
-	sprintf(buffer,"%s", error_http_msg );
+	bzero(buffer, BUFFSIZE);
 
-	result = write(newsockfd,buffer,strlen(buffer));
+	sprintf(buffer, "%s", error_http_msg );
+
+	result = write(newsockfd, buffer, strlen(buffer));
 	TCPDEBUG("Send NOTFOUND:[%s]\n", buffer );
 
 	return result;
@@ -245,30 +190,32 @@ int tcp_open(int portno)
 {
 	int sockfd;
 	struct sockaddr_in serv_addr;
-	 int optval; /* flag value for setsockopt */
+	int optval;  /* flag value for setsockopt */
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0)
-	tcp_error("ERROR opening socket");
+	if (sockfd < 0) {
+		tcp_error("ERROR opening socket");
+	}
 
-	  /* setsockopt: Handy debugging trick that lets
-	   * us rerun the server immediately after we kill it;
-	   * otherwise we have to wait about 20 secs.
-	   * Eliminates "ERROR on binding: Address already in use" error.
-	   */
-	  optval = 1;
-	  setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
-			 (const void *)&optval , sizeof(int));
+	/* setsockopt: Handy debugging trick that lets
+	 * us rerun the server immediately after we kill it;
+	 * otherwise we have to wait about 20 secs.
+	 * Eliminates "ERROR on binding: Address already in use" error.
+	 */
+	optval = 1;
+	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
+		   (const void*)&optval, sizeof(int));
 
-	bzero((char *) &serv_addr, sizeof(serv_addr));
+	bzero((char*)&serv_addr, sizeof(serv_addr));
 	//portno = atoi(argv[1]);
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	serv_addr.sin_port = htons(portno);
-	if (bind(sockfd, (struct sockaddr *) &serv_addr,
-	      sizeof(serv_addr)) < 0)
-	      tcp_error("ERROR on binding");
-	listen(sockfd,5);
+	if (bind(sockfd, (struct sockaddr *)&serv_addr,
+		 sizeof(serv_addr)) < 0) {
+		tcp_error("ERROR on binding");
+	}
+	listen(sockfd, 5);
 
 	return sockfd;
 }
@@ -281,8 +228,8 @@ int tcp_close(int sockfd)
 }
 
 
-int tcp_service( int sockfd ) {
-
+int tcp_service( int sockfd )
+{
 	int newsockfd;
 	struct sockaddr_in cli_addr;
 	socklen_t clilen;
@@ -290,47 +237,69 @@ int tcp_service( int sockfd ) {
 	int n, result;
 
 	clilen = sizeof(cli_addr);
-
-
 	newsockfd = accept(sockfd,
-		 (struct sockaddr *) &cli_addr,
-		 &clilen);
+			   (struct sockaddr *)&cli_addr,
+			   &clilen);
 
 	if (newsockfd < 0) {
 		tcp_error("ERROR on accept");
 		return -1;
 	}
 
-	bzero(buffer,BUFFSIZE);
-	result = read(newsockfd,buffer,BUFFSIZE-1);
-	if (result < 0) tcp_error("ERROR reading from socket");
-	else TCPDEBUG("READED:[%s]\n", buffer );
+	bzero(buffer, BUFFSIZE);
+	result = read(newsockfd, buffer, BUFFSIZE - 1);
+	if (result < 0) {
+		tcp_error("ERROR reading from socket");
+	} else{
+		TCPDEBUG("READED:[%s]\n", buffer );
+	}
 
 	// - Check URL
-	if( strstr( buffer, "GET /captura.html" ) ) {
+	if ( strstr( buffer, "GET /captura.html" ) ) {
 		// buidar l'array aquí i generar la cadena buffer de json
 		TCPDEBUG("INC\n");
 		result = tcp_cmd_captura( newsockfd, buffer);
-	}
-	if( strstr( buffer, "GET /fita3.html" ) ) {
-		// buidar l'array aquí i generar la cadena buffer de json
-		TCPDEBUG("INC\n");
-		result = tcp_cmd_fita3( newsockfd, buffer);
-	}
-	else if( strstr( buffer, "GET /decrementa.html" ) ) {
-		// buidar l'array aquí i generar la cadena buffer de json
-		TCPDEBUG("DEC\n");
-		result = tcp_cmd_decrementa( newsockfd, buffer);
-	}
-	else {
+	}else {
 		result = tcp_cmd_error( newsockfd, buffer );
 	}
 
-	if (result < 0) tcp_error("ERROR writing to socket");
+	if (result < 0) {
+		tcp_error("ERROR writing to socket");
+	}
 	close(newsockfd);
 
 	return 0;
 
+}
+/*!
+   \brief Lee del ficher la pagina web a mostrar y la deja en str
+   \param "char *fichero: Nombre del fichero de la pagina web"
+   \param "char *str: Variable donde se guardará el texto de la web"
+   \return "False si OK, -1 si NOK"
+ */
+int webfile_read(char *fichero, char *str)
+{
+	FILE *fp;
+	//char str[2000];        /** Variable donde se guardara el texto del fichero*/
+	int i = 0;
+
+	/* opening file for reading */
+	fp = fopen(fichero, "r");
+	if (fp == NULL) {
+		perror("Error opening file");
+		return -1;
+	}else{
+		printf("Fichero .html abierto con exito.\n");
+	}
+	/** se obtiene caracter a caracter el texto del fichero hasta encontrar el end of file*/
+	while (!feof(fp)) {
+		str[i] = fgetc(fp);
+		i++;
+	}
+	//printf("%s", str);
+	fclose(fp);
+
+	return 0;
 }
 
 int main(int argc, char *argv[])
@@ -338,7 +307,7 @@ int main(int argc, char *argv[])
 	int sockfd = 0;
 	int result = 0;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		printf("Usage: webserver port\n");
 		return -1;
 	}
@@ -346,14 +315,15 @@ int main(int argc, char *argv[])
 	int num_connection = 1;
 
 	do {
-		TCPDEBUG("tcp_service(%03d): Starts...\n", num_connection);
+		timestamp(PRINT_TIME);
+		TCPDEBUG(" - tcp_service(%03d): Starts...\n", num_connection);
 		result = tcp_service(sockfd);
-		TCPDEBUG("tcp_service(%03d): ...Ends\n", num_connection);
-
+		timestamp(PRINT_TIME);
+		TCPDEBUG(" - tcp_service(%03d): ...Ends\n", num_connection);
 		TCPDEBUG("\n\n=============================================\n\n");
 
 		num_connection++;
-	} while	(result==0);
+	} while (result == 0);
 
 	tcp_close(sockfd);
 }
