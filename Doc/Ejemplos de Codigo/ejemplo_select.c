@@ -3,6 +3,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+/*!
+   \file Ejemplo de comunicacion serie usando selec()
+   \brief "Description"
+   \author "Your name"
+   \date "DD"/"Month"/"Year"
+*/
+
 int main(void) {
     fd_set rfds;
     struct timeval tv;

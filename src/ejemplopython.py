@@ -1,3 +1,19 @@
+#/***************************************************************************
+#              Exemple uso SenseHat Raspberry Pi
+#                             -------------------
+#    begin                : Monday Dec 23 19:30:00 CET 2018
+#    copyright            : (C) 2018 by
+#    email                :
+#***************************************************************************/
+#/***************************************************************************
+#*                                                                         *
+#*   This program is free software; you can redistribute it and/or modify  *
+#*   it under the terms of the GNU General Public License as published by  *
+#*   the Free Software Foundation; either version 2 of the License, or     *
+#*   (at your option) any later version.                                   *
+#*                                                                         *
+#***************************************************************************/
+
 import sqlite3
 import sys
 import time
@@ -6,8 +22,11 @@ from sense_emu import SenseHat
 #varieble para referencia del indice en base de datos
 index = 0
 
+#fill_line se usa para llenar la base de datos con la informacion de angulo, temperatura y fecha
+
 def fill_line (angulo):
 
+    #Se discretiza en angulo en 8 niveles para poder mostrar en las 8 lineas del panel led del SenseHat.
     if angulo > 0 and angulo <= 180:
             lado = "D"
             columna = 0
@@ -24,13 +43,14 @@ def fill_line (angulo):
             columna = 2
             inclinacion = 0
 
-    # Insert a row of data
+    # Inserta una fila de informacion
     data = time.asctime( time.localtime(time.time()) )
-    c.execute("insert into angulo values (?, ?, ?, ?)", (index, data, inclinacion, lado))
-    # Save (commit) the changes
+    c.execute("insert into angulo values (?, ?, ?, ?, ?)", (index, data, inclinacion, lado, temp))
+    # Guardar (commit) los cambios
     conn.commit()
-
-    print ("Index: %i |" % index), ("%s |" % data), ("Inclinacion = %2.2f |" % inclinacion), ("Lado: %c |" % lado)
+    #imprimer por pantalla los datos guardados.
+    print ("Index: %i |" % index), ("%s |" % data), ("Inclinacion = %2.2f |" % inclinacion), ("Lado: %c |" % lado),("Temp: %2.2f C|" % temp)
+    #Mostrar grado de inclinacion en el panel led del SenseHat
     nivel = int(nivel)
     i = 0
     while i < 4:
@@ -46,7 +66,7 @@ c = conn.cursor()
 
 # Create table
 try:
-    c.execute('CREATE TABLE angulo (Ind, Data , Inclinacion, Lado )')
+    c.execute('CREATE TABLE angulo (Ind, Data , Inclinacion, Lado, temperatura )')
 except:
     print ('La base de datos ya contiene los campos')
     c.execute('SELECT MAX(Ind) FROM angulo')
@@ -61,12 +81,13 @@ green = 255
 #bucle para la lectura constante de los valores del giroscopio
 while True:
     o = sense.get_orientation()
+    temp = sense.get_temperature()
     roll = o["roll"]
     sense.clear (0,0,0)
     fill_line(roll)
     time.sleep(1)
     index = index + 1
 
-# We can also close the connection if we are done with it.
-# Just be sure any changes have been committed or they will be lost.
+# Se cierra la conexion con la base de datos.
+#todo aquello a lo que no se le haya hecho un commit, se perdera
 conn.close()
