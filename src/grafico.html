@@ -9,7 +9,6 @@ canvas {
 }
 </style>
 </head>
-<meta http-equiv="refresh" content="1">
 <body onload="startGame()">
 <script>
 var myGamePiece;
@@ -17,6 +16,7 @@ function startGame() {
     myGamePiece = new component(200, 10, "red", 150, 100);
     myGameArea.start();
 }
+//Se dibuja un frame de canvas para poder pintar el grafico
 var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
@@ -25,7 +25,8 @@ var myGameArea = {
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.frameNo = 0;
-        this.interval = setInterval(updateGameArea, 20);
+        //Set interval en milisegundos
+        this.interval = setInterval(updateGameArea, 250);
     },
     stop : function() {
         clearInterval(this.interval);
@@ -34,6 +35,7 @@ var myGameArea = {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }
+//Se define forma, color y tamaño del grafico a dibujar dentro del vanvas
 function component(width, height, color, x, y) {
     this.width = width;
     this.height = height;
@@ -51,10 +53,49 @@ function component(width, height, color, x, y) {
     }
 }
 function updateGameArea() {
+
+        // Create an instance of the HTTP request object
+        var xmlHttp = new XMLHttpRequest();
+
+        // Specify HTTP GET by default and supply the relative url
+        xmlHttp.open("GET", "temp_last_angle_data", false);
+
+        // Start a synchronous AJAX request and wait
+        // for the response
+        xmlHttp.send(null);
+        //Se le asigna una etiqueta "anguloREcibido" a la variable targetNode
+        var targetNode = document.getElementById("anguloRecbido");
+
+        // Use the HTML returned from server to create list
+        targetNode.innerHTML = xmlHttp.responseText;
+
     myGameArea.clear();
-    myGamePiece.angle = %f * Math.PI / 180;
+    myGamePiece.angle = xmlHttp.responseText * Math.PI / 180;
     myGamePiece.update();
 }
+
+function GetAngleData()
+{
+    // Create an instance of the HTTP request object
+    var xmlHttp = new XMLHttpRequest();
+
+    // Specify HTTP GET by default and supply the relative url
+    xmlHttp.open("GET", "temp_last_angle_data", false);
+
+    // Start a synchronous AJAX request and wait
+    // for the response
+    xmlHttp.send(null);
+    //Se le asigna una etiqueta "anguloREcibido" a la variable targetNode
+    var targetNode = document.getElementById("anguloRecbido");
+
+    // Use the HTML returned from server to create list
+    targetNode.innerHTML = xmlHttp.responseText;
+}
 </script>
+
+<form>
+    <input onclick="GetAngleData();"type="button" value="Man Angle update"/>
+    <div id="anguloRecbido"></div>
+</form>
 </body>
 </html>

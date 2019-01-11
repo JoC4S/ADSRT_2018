@@ -76,12 +76,18 @@ char* timestamp(int print)
 int callback_angulo(void *NotUsed, int argc, char **argv, char **azColName)
 {
 	char angulo[100];
+	FILE *fp;
 
 	bzero(angulo, 100);
 	NotUsed = 0;
 	strcpy(angulo, argv[0]);
 	global_angulo = atof(angulo);
 	printf("Angulo = %f ºC\n", global_angulo );
+	//Se guarad el dato en el fichero que será consultado por el servidor
+	fp = fopen ("temp_last_angle_data", "w+");
+	fprintf(fp, "%f",  global_angulo);
+	fclose(fp);
+	printf("---> Dato guardo en fichero 'temp_last_angle'\n");
 	return 0;
 }
 /*!
@@ -133,8 +139,40 @@ int tcp_cmd_captura( int newsockfd, char *buffer)
 
 	const char *httpheader = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
 	TCPDEBUG("Found LOCAL URL webservice:[%s]\n", "captura.html" );
-	get_angle();
+	//get_angle();
 	webfile_read("grafico.html", web);
+
+	char htmlweb[BUFFSIZE];
+	bzero(htmlweb, BUFFSIZE);
+	sprintf(htmlweb, web, global_angulo);
+	sprintf(resposta, "%sContent-Length: %d\r\n\r\n%s", httpheader, (int)strlen(htmlweb), htmlweb);
+
+	result = write(newsockfd, resposta, strlen(resposta));
+	//TCPDEBUG("SENDED:[%s] ", resposta );
+
+	return result;
+}
+
+/*!
+   \brief Funcion que devuelve el dato del ultimo angulo extraido de la base de datos para la peticion AJAX
+   \param "Param description"
+   \pre "Pre-conditions"
+   \post "Post-conditions"
+   \return "Return of the function"
+*/
+int tcp_cmd_angleupdate( int newsockfd, char *buffer)
+{
+	int result;
+	char resposta[BUFFSIZE];
+
+	bzero(resposta, BUFFSIZE);
+	char web[2000];
+	bzero(web, 2000);
+
+	const char *httpheader = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
+	TCPDEBUG("Found LOCAL URL webservice:[%s]\n", "temp_last_angle_data" );
+	get_angle();
+	webfile_read("temp_last_angle_data", web);
 
 	char htmlweb[BUFFSIZE];
 	bzero(htmlweb, BUFFSIZE);
@@ -259,6 +297,10 @@ int tcp_service( int sockfd )
 		// buidar l'array aquí i generar la cadena buffer de json
 		TCPDEBUG("INC\n");
 		result = tcp_cmd_captura( newsockfd, buffer);
+	}else if ( strstr( buffer, "GET /temp_last_angle_data" ) ){
+		// buidar l'array aquí i generar la cadena buffer de json
+		TCPDEBUG("INC\n");
+		result = tcp_cmd_angleupdate( newsockfd, buffer);
 	}else {
 		result = tcp_cmd_error( newsockfd, buffer );
 	}
@@ -272,7 +314,7 @@ int tcp_service( int sockfd )
 
 }
 /*!
-   \brief Lee del ficher la pagina web a mostrar y la deja en str
+   \brief Lee del fichero la pagina web a mostrar y la deja en str
    \param "char *fichero: Nombre del fichero de la pagina web"
    \param "char *str: Variable donde se guardará el texto de la web"
    \return "False si OK, -1 si NOK"
@@ -289,14 +331,18 @@ int webfile_read(char *fichero, char *str)
 		perror("Error opening file");
 		return -1;
 	}else{
-		printf("Fichero .html abierto con exito.\n");
+		printf("---> Fichero '%s' abierto con exito.\n",fichero);
 	}
 	/** se obtiene caracter a caracter el texto del fichero hasta encontrar el end of file*/
 	while (!feof(fp)) {
 		str[i] = fgetc(fp);
 		i++;
 	}
-	//printf("%s", str);
+	/*Se elimina el último simbolo leido del fichero (da caracter desconocido. Interrongante en rombo)*/
+	str[i-1] = '\0';
+	printf("---> Contenio de '%s':\n", fichero);
+	printf("%s\n", str);
+	printf("---> fin de contenido de '%s'\n", fichero);
 	fclose(fp);
 
 	return 0;

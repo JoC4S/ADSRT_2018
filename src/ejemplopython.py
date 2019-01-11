@@ -30,13 +30,19 @@ def fill_line (angulo):
     if angulo > 0 and angulo <= 180:
             lado = "D"
             columna = 0
-            nivel = angulo / 22.5
+            if angulo < 90:
+                nivel = angulo / 12.85
+            else:
+                nivel = 7
             inclinacion = angulo
     elif angulo > 180 and angulo < 360:
             lado = "I"
             columna = 4
-            nivel = (360 - angulo ) / 22.5
-            inclinacion = 360 - angulo
+            if angulo >= 270:
+                nivel =  (360 - angulo)  / 12.85
+            else:
+                nivel = 7
+            inclinacion = angulo - 360
     else:
             lado = "C"
             nivel = 0
@@ -49,7 +55,7 @@ def fill_line (angulo):
     # Guardar (commit) los cambios
     conn.commit()
     #imprimer por pantalla los datos guardados.
-    print ("Index: %i |" % index), ("%s |" % data), ("Inclinacion = %2.2f |" % inclinacion), ("Lado: %c |" % lado),("Temp: %2.2f C|" % temp)
+    print ("Index: %i |" % index), ("%s |" % data),("Angulo = %d |" % angulo), ("Inclinacion = %2.2f |" % inclinacion), ("Lado: %c |" % lado),("Temp: %2.2f C|" % temp)
     #Mostrar grado de inclinacion en el panel led del SenseHat
     nivel = int(nivel)
     i = 0
@@ -82,10 +88,11 @@ green = 255
 while True:
     o = sense.get_orientation()
     temp = sense.get_temperature()
-    roll = o["roll"]
+    roll = o["pitch"]
     sense.clear (0,0,0)
     fill_line(roll)
-    time.sleep(1)
+    #se toman muestras cada segundo
+    time.sleep(0.5)
     index = index + 1
 
 # Se cierra la conexion con la base de datos.
