@@ -77,6 +77,10 @@ libmailarm:
 webserver:
 	gcc -c -o webserver.o webserver.c
 	gcc -o webserver webserver.o -lsqlite3
+
+webserver_arm:
+	arm-linux-gnueabihf-gcc -c -o webserver_arm.o webserver.c -I../include
+	arm-linux-gnueabihf-gcc -o webserver_arm webserver_arm.o -I../include -L../lib/arm/ -lsqlite3
 fichero:
 	gcc -c -o ejemplolectura_fichero.o ejemplolectura_fichero.c
 	gcc -o ejemplolectura_fichero ejemplolectura_fichero.o
