@@ -78,8 +78,7 @@ except:
     c.execute('SELECT MAX(Ind) FROM angulo')
     index = c.fetchone()[0]
 # Se obtiene de la base de datos el mayor numero de indice registrado para asignarloa  "index"
-
-print ('Valor de Ind: %d'% index), type(index)
+#print ('Valor de Ind: %d' % index), type(index)
 
 sense = SenseHat()
 green = 255

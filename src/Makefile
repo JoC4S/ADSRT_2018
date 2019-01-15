@@ -81,6 +81,12 @@ webserver:
 webserver_arm:
 	arm-linux-gnueabihf-gcc -c -o webserver_arm.o webserver.c -I../include
 	arm-linux-gnueabihf-gcc -o webserver_arm webserver_arm.o -I../include -L../lib/arm/ -lsqlite3
+	scp webserver_arm ejemplopython.py grafico.html pi@192.168.2.199:/tmp
+	rm webserver_arm webserver_arm.o
 fichero:
 	gcc -c -o ejemplolectura_fichero.o ejemplolectura_fichero.c
 	gcc -o ejemplolectura_fichero ejemplolectura_fichero.o
+
+ex2:
+	gcc -c -o ./ex2/parcial.o parcial.c
+	gcc -o parcial parcial.o
