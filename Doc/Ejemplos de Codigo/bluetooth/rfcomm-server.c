@@ -13,7 +13,7 @@
 
 int main(int argc, char **argv)
 {
-	struct sockaddr_rc loc_addr = { 0 }, rem_addr = { 0 };
+	struct sockaddr_rc loc_addr = { 0 }, rem_addr = { D4:A3:3D:F1:F5:D1};
 	char buf[1024] = { 0 };
 	int s, client, bytes_read;
 	socklen_t opt = sizeof(rem_addr);

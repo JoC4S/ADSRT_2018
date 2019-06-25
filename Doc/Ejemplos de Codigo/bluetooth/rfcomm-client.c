@@ -19,7 +19,8 @@ int main(int argc, char **argv)
 {
 	struct sockaddr_rc addr = { 0 };
 	int s, status;
-	char dest[18] = "B8:27:EB:00:3D:BC";
+	//char dest[18] = "B8:27:EB:00:3D:BC";
+	char dest[18] = "D4:A3:3D:F1:F5:D1";
 
 	// allocate a socket
 	s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
@@ -34,7 +35,8 @@ int main(int argc, char **argv)
 
 	// send a message
 	if ( status == 0 ) {
-		status = write(s, "hello!", 6);
+		//status = write(s, "hello!", 6);
+		printf("conexion realizada.\n");
 	}
 
 	if ( status < 0 ) {

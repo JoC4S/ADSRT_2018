@@ -6,26 +6,35 @@
  * A more detailed explanation of the data structures and functions used follows.
  *
  * To compile: # gcc -o simplescan simplescan.c -lbluetooth
+ *Needs libbluetooth-dev: sudo apt install libbluetooth-dev
  */
 // System
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+
 
 // Bluetooth
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 
-int
-main()
+int main(int argc, char **argv)
 {
-
 	// Get bluetooth device id
+	/* If there are multiple Bluetooth adapters present, then to choose the adapter
+	* with address ``01:23:45:67:89:AB", pass the char * representation of the address
+	* to hci_devid and use that in place of hci_get_route.
+	*ex: int dev_id = hci_devid( "01:23:45:67:89:AB" );
+	*/
 	int device_id = hci_get_route(NULL); // Passing NULL argument will retrieve the id of first avalaibe device
 
 	if (device_id < 0) {
 		printf("Error: Bluetooth device not found");
 		exit(1);
+	}else{
+		printf("Searching on Bluetooth Id: %i ...\n",device_id);
 	}
 
 	// Find nearby devices
