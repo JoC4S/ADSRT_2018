@@ -1,4 +1,4 @@
-/*!
+        /*!
    \file rfcomm-client.c
    \brief "Description"
    \author "Your name"
@@ -11,6 +11,7 @@ for the socket type.
 */
 #include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
@@ -18,12 +19,12 @@ for the socket type.
 int main(int argc, char **argv)
 {
 	struct sockaddr_rc addr = { 0 };
-	int s, status;
+	int sd, status;
 	//char dest[18] = "B8:27:EB:00:3D:BC";
-	char dest[18] = "D4:A3:3D:F1:F5:D1";
+	char dest[18] = "B8:27:EB:E2:27:ED";
 
 	// allocate a socket
-	s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+	sd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 
 	// set the connection parameters (who to connect to)
 	addr.rc_family = AF_BLUETOOTH;
@@ -31,18 +32,19 @@ int main(int argc, char **argv)
 	str2ba( dest, &addr.rc_bdaddr );
 
 	// connect to server
-	status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
-
+	printf("Conectando a servidor...\n");
+	status = connect(sd, (struct sockaddr *)&addr, sizeof(addr));
+	printf("conexion realizada...\n");
 	// send a message
+	char *msg = "hola!";
 	if ( status == 0 ) {
-		//status = write(s, "hello!", 6);
-		printf("conexion realizada.\n");
+		status = write(sd, msg, sizeof(msg));
 	}
 
 	if ( status < 0 ) {
 		perror("uh oh");
 	}
 
-	close(s);
+	close(sd);
 	return 0;
 }

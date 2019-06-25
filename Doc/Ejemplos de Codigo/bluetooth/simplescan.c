@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	}
 
 	// Find nearby devices
-	int len = 8;                                                                    // Search time = 1.28 * len seconds
+	int len = 3;                                                                    // Search time = 1.28 * len seconds
 	int max_rsp = 255;                                                              // Return maximum max_rsp devices
 	int flags = IREQ_CACHE_FLUSH;                                                   // Flush out the cache of previously detected devices.
 	inquiry_info* i_infs = (inquiry_info*)malloc(max_rsp * sizeof(inquiry_info));
